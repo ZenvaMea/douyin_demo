@@ -12,14 +12,14 @@ const STEPS = [
   {
     n: '2',
     emoji: '🤖',
-    title: 'AI 拆解',
-    desc: '逐句声明 · 联网核查',
+    title: 'AI 处理',
+    desc: '抓重点 · 做工具 · 辨真假',
   },
   {
     n: '3',
     emoji: '📋',
-    title: '看真相',
-    desc: '三色证据 · 真相版本',
+    title: '直接用上',
+    desc: '清单 · 步骤 · 一键复制',
   },
 ];
 

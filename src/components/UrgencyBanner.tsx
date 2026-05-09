@@ -16,13 +16,13 @@ export function UrgencyBanner() {
       className="w-full bg-[var(--color-nei-bg)] border-b-2 border-[var(--color-nei-bg)]"
     >
       <div className="max-w-[1080px] mx-auto px-6 py-2.5 flex items-center justify-center gap-2 flex-wrap text-center">
-        <span className="text-base">⚠️</span>
+        <span className="text-base">📊</span>
         <span className="text-[12px] sm:text-[13px] font-extrabold text-[var(--color-nei-text)] tracking-tight">
-          61% 的抖音健康类视频含夸大或错误信息
+          抖音用户每天刷 50+ 条视频
         </span>
         <span className="text-[var(--color-nei-text)] opacity-50 hidden sm:inline">·</span>
         <span className="text-[11px] sm:text-[12px] font-bold text-[var(--color-nei-text)] hidden sm:inline">
-          你刷过的，可能也在其中
+          但 90% 看完就忘，从未真正用上 🤷
         </span>
       </div>
     </motion.div>
