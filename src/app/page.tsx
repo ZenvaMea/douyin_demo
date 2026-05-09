@@ -19,6 +19,7 @@ import { RumorMuseum } from '@/components/RumorMuseum.tsx';
 import { ShareCard } from '@/components/ShareCard.tsx';
 import { HistoryDrawer } from '@/components/HistoryDrawer.tsx';
 import { ReportView } from '@/components/ReportView.tsx';
+import { Toast } from '@/components/Toast.tsx';
 import { incrementCheckCount } from '@/lib/utils/userLevel.ts';
 import { addHistory, getHistory, type HistoryRecord } from '@/lib/utils/history.ts';
 import { cn } from '@/lib/utils/cn.ts';
@@ -63,6 +64,7 @@ export default function Home() {
   const [showShareCard, setShowShareCard] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [printRecords, setPrintRecords] = useState<HistoryRecord[] | null>(null);
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
   const levelIncremented = useRef(false);
   const historySaved = useRef(false);
   const currentSourceRef = useRef<'link' | 'paste' | 'sample'>('paste');
@@ -135,12 +137,31 @@ export default function Home() {
 
   const exportCurrent = () => {
     const r = buildCurrentRecord();
-    if (r) setPrintRecords([r]);
+    if (!r) return;
+    setToastMsg('正在生成 PDF...');
+    // 用 requestAnimationFrame 让 toast 先渲染
+    requestAnimationFrame(() => {
+      setTimeout(() => setPrintRecords([r]), 50);
+    });
+    setTimeout(() => setToastMsg(null), 1200);
   };
 
   const exportAllHistory = () => {
     const all = getHistory();
-    if (all.length > 0) setPrintRecords(all);
+    if (all.length === 0) return;
+    setToastMsg(`正在生成 PDF（${all.length} 条）...`);
+    requestAnimationFrame(() => {
+      setTimeout(() => setPrintRecords(all), 50);
+    });
+    setTimeout(() => setToastMsg(null), 1500);
+  };
+
+  const openShareCard = () => {
+    setToastMsg('正在生成分享卡片...');
+    requestAnimationFrame(() => {
+      setTimeout(() => setShowShareCard(true), 50);
+    });
+    setTimeout(() => setToastMsg(null), 800);
   };
 
   /** 从历史记录恢复结果（不重新调 API） */
@@ -711,11 +732,7 @@ export default function Home() {
                 </div>
                 {phase === 'done' && (
                   <div className="flex items-center gap-2 flex-wrap">
-                    <AppleButton
-                      variant="primary"
-                      size="sm"
-                      onClick={() => setShowShareCard(true)}
-                    >
+                    <AppleButton variant="primary" size="sm" onClick={openShareCard}>
                       📤 转给家人
                     </AppleButton>
                     <AppleButton variant="secondary" size="sm" onClick={exportCurrent}>
@@ -859,6 +876,9 @@ export default function Home() {
 
       {/* === 报告打印视图（隐藏，触发 print 时显示） === */}
       <ReportView records={printRecords} onClose={() => setPrintRecords(null)} />
+
+      {/* === 全局 Toast 提示 === */}
+      <Toast message={toastMsg ?? ''} visible={Boolean(toastMsg)} />
 
       {/* === 转发分享卡片 modal === */}
       {showShareCard && extraction && (
