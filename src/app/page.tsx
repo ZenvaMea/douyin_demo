@@ -74,10 +74,14 @@ export default function Home() {
   };
 
   const useSample = (s: SampleData) => {
+    // 点击样例 = 一键体验：填数据 + 立刻触发核查
+    // 用户视野会随 resultRef 自动滚到结果区
     setMode('paste');
     setTranscript(s.transcript);
     setTitle(s.title);
     setAuthor(s.author);
+    reset();
+    runCheck(s.transcript, s.title, s.author);
   };
 
   const handleExtractAndCheck = async () => {
