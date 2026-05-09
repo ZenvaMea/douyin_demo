@@ -9,6 +9,10 @@ import { SampleCard, type SampleData } from '@/components/SampleCard.tsx';
 import { ProgressBar } from '@/components/ProgressBar.tsx';
 import { CredibilityRing } from '@/components/CredibilityRing.tsx';
 import { ClaimCard, type ClaimCardData, type Verdict } from '@/components/ClaimCard.tsx';
+import { UrgencyBanner } from '@/components/UrgencyBanner.tsx';
+import { ThreeStepFlow } from '@/components/ThreeStepFlow.tsx';
+import { ValueProps } from '@/components/ValueProps.tsx';
+import { PainPoints } from '@/components/PainPoints.tsx';
 import { cn } from '@/lib/utils/cn.ts';
 
 type Phase = 'idle' | 'fetching' | 'extracting' | 'verifying' | 'done' | 'error';
@@ -218,6 +222,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
+      {showInputArea && <UrgencyBanner />}
       <Header />
 
       <main className="flex-1 max-w-[920px] mx-auto w-full px-6 py-10 sm:py-14">
@@ -228,13 +233,13 @@ export default function Home() {
             transition={{ duration: 0.32 }}
           >
             {/* === Hero === */}
-            <div className="text-center mb-12">
+            <div className="text-center mb-10">
               {/* 大猫头鹰吉祥物 */}
               <motion.div
                 initial={{ scale: 0.6, rotate: -10 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: 'spring', delay: 0.05, stiffness: 380 }}
-                className="text-[88px] sm:text-[112px] inline-block animate-float leading-none mb-2"
+                className="text-[80px] sm:text-[100px] inline-block animate-float leading-none mb-2"
               >
                 🦉
               </motion.div>
@@ -246,36 +251,40 @@ export default function Home() {
                 transition={{ delay: 0.15 }}
                 className="inline-flex items-center gap-1.5 mb-5 px-3.5 h-7 rounded-full bg-[var(--color-duo-bg)] border-2 border-[var(--color-duo-light)]"
               >
-                <span className="text-[14px]">🎯</span>
+                <span className="text-[14px]">⚡</span>
                 <span className="text-[11px] font-extrabold uppercase tracking-wider text-[var(--color-supported-text)]">
-                  AI 帮你找证据
+                  AI 30 秒帮你拆穿
                 </span>
               </motion.div>
 
-              {/* 巨大标题（克制配色） */}
+              {/* 强情绪痛点标题 */}
               <motion.h1
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.22, duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
                 className="type-display text-text mb-5"
               >
-                别让营销号
-                <br className="sm:hidden" />
-                <span className="text-duo">骗</span>
-                你！
+                老妈群里的「养生谣言」，
+                <br />
+                <span className="text-duo">30 秒</span>
+                帮你<span className="text-duo">拆穿</span>。
               </motion.h1>
 
-              {/* 副标题 */}
+              {/* 差异化承诺副标题 */}
               <motion.p
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.32 }}
-                className="text-[16px] sm:text-[18px] font-bold text-text-2 max-w-[560px] mx-auto leading-relaxed"
+                className="text-[16px] sm:text-[18px] font-bold text-text-2 max-w-[620px] mx-auto leading-relaxed"
               >
-                粘贴抖音视频链接，AI 帮你拆解每句声明，
+                不是简单标个真假 —— AI 给你
+                <span className="text-text"> 每句话的证据 </span>+
+                <span className="text-text"> 信源出处 </span>+
+                <span className="text-text"> 真相版本</span>。
                 <br className="hidden sm:block" />
-                逐条核查 <span className="text-duo">✓ 摆证据</span>，
-                判断权还给你！
+                <span className="text-text-3 text-[14px] sm:text-[16px]">
+                  把判断权还给你自己 ✓
+                </span>
               </motion.p>
             </div>
 
@@ -386,11 +395,27 @@ export default function Home() {
               </AnimatePresence>
             </motion.div>
 
-            {/* === 示例样本 === */}
+            {/* === 3 步流程（降低使用门槛） === */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
+              transition={{ delay: 0.45 }}
+              className="mb-10"
+            >
+              <div className="text-center mb-4">
+                <div className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-text-3">
+                  💡 就这么简单
+                </div>
+              </div>
+              <ThreeStepFlow />
+            </motion.div>
+
+            {/* === 经典翻车样例 === */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.55 }}
+              className="mb-12"
             >
               <div className="text-center mb-4">
                 <div className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-text-3">
@@ -401,6 +426,65 @@ export default function Home() {
                 {Object.entries(samples).map(([key, sample], i) => (
                   <SampleCard key={key} sample={sample} onClick={useSample} index={i} />
                 ))}
+              </div>
+            </motion.div>
+
+            {/* === 痛点共鸣区 === */}
+            <section className="mb-14">
+              <div className="text-center mb-6">
+                <h2 className="type-title-1 text-text mb-2">
+                  你是不是<span className="text-duo">经常</span>遇到？
+                </h2>
+                <p className="text-[14px] font-bold text-text-3">
+                  我们都被骗过，但下次可以不再被骗 👀
+                </p>
+              </div>
+              <PainPoints />
+            </section>
+
+            {/* === 4 个价值点（凭什么用我？） === */}
+            <section className="mb-14">
+              <div className="text-center mb-6">
+                <h2 className="type-title-1 text-text mb-2">
+                  凭什么用<span className="text-duo">打假搭子</span>？
+                </h2>
+                <p className="text-[14px] font-bold text-text-3">
+                  和市面上的科普 / 辟谣账号有什么不同 🤔
+                </p>
+              </div>
+              <ValueProps />
+            </section>
+
+            {/* === 二次 CTA === */}
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.5 }}
+              transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+              className="duo-card p-6 sm:p-8 mb-8 text-center bg-[var(--color-duo-bg)] border-[var(--color-duo)]"
+            >
+              <div className="text-4xl mb-3">🚀</div>
+              <h3 className="type-title-1 text-text mb-2">现在就核一条试试？</h3>
+              <p className="text-[14px] font-bold text-text-2 mb-5 max-w-[420px] mx-auto">
+                把你最近刷到、最想吐槽的那条抖音粘贴进来，AI 立即拆给你看。
+              </p>
+              <AppleButton
+                variant="primary"
+                size="xl"
+                onClick={() => {
+                  document.querySelector('input[type="url"]')?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                  });
+                  setTimeout(() => {
+                    (document.querySelector('input[type="url"]') as HTMLInputElement | null)?.focus();
+                  }, 600);
+                }}
+              >
+                立即拆穿一条 →
+              </AppleButton>
+              <div className="text-[11px] font-bold text-text-3 mt-4">
+                免费 · 不用注册 · 30 秒出结果
               </div>
             </motion.div>
 
