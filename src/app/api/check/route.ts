@@ -1,10 +1,9 @@
 /**
- * 综合核查 API（Server-Sent Events 流式输出）
+ * 核查 API（Server-Sent Events 流式输出）
  *
- * 同时输出三大能力：
- *   1. insights：核心要点 + 工具包（先返回，最快）
- *   2. extraction：声明拆解
- *   3. verification：每条核查结果（陆续）
+ * 聚焦打假：
+ *   1. 声明拆解
+ *   2. 每条核查（陆续返回三色 + 证据 + 真相版本）
  *
  * 请求体：
  *   { transcript: string, title?: string, author?: string }
@@ -14,7 +13,6 @@ import { NextRequest } from 'next/server';
 import { createProvider } from '@/lib/llm/index.ts';
 import { extractClaims } from '@/lib/services/claim-extractor.ts';
 import { verifyClaim } from '@/lib/services/verifier.ts';
-import { extractInsights } from '@/lib/services/insights-extractor.ts';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -28,7 +26,7 @@ interface CheckRequestBody {
 
 export async function POST(req: NextRequest) {
   const body = (await req.json()) as CheckRequestBody;
-  const { transcript, title, author } = body;
+  const { transcript } = body;
 
   if (!transcript || transcript.trim().length < 10) {
     return new Response(JSON.stringify({ error: '文案过短，请粘贴完整内容' }), {
@@ -48,24 +46,11 @@ export async function POST(req: NextRequest) {
       try {
         const provider = createProvider();
         send('meta', { provider: provider.name, model: provider.model });
-
-        // === Step 1：并行启动 insights + extraction ===
-        send('phase', { phase: 'extracting', label: '正在提炼要点 + 拆解声明...' });
-
-        const insightsPromise = extractInsights(provider, transcript, title, author)
-          .then((insights) => {
-            send('insights', insights);
-            return insights;
-          })
-          .catch((err) => {
-            send('insights_error', { message: (err as Error).message });
-            return null;
-          });
+        send('phase', { phase: 'extracting', label: '正在拆解可核查声明...' });
 
         const extraction = await extractClaims(provider, transcript);
         send('extraction', extraction);
 
-        // === Step 2：并发核查所有声明 ===
         send('phase', {
           phase: 'verifying',
           label: `正在并发核查 ${extraction.claims.length} 条声明...`,
@@ -98,9 +83,6 @@ export async function POST(req: NextRequest) {
             }
           }),
         );
-
-        // 等 insights 完成（如果还没完）
-        await insightsPromise;
 
         send('done', { ok: true });
         controller.close();

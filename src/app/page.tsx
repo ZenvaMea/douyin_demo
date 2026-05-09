@@ -13,9 +13,8 @@ import { UrgencyBanner } from '@/components/UrgencyBanner.tsx';
 import { ThreeStepFlow } from '@/components/ThreeStepFlow.tsx';
 import { ValueProps } from '@/components/ValueProps.tsx';
 import { PainPoints } from '@/components/PainPoints.tsx';
-import { InsightsPanel, type InsightsData } from '@/components/InsightsPanel.tsx';
-import { ToolKit } from '@/components/ToolKit.tsx';
-import type { InsightsResult } from '@/lib/services/insights-extractor.ts';
+import { MythQuiz } from '@/components/MythQuiz.tsx';
+import { TickerStats } from '@/components/TickerStats.tsx';
 import { cn } from '@/lib/utils/cn.ts';
 
 type Phase = 'idle' | 'fetching' | 'extracting' | 'verifying' | 'done' | 'error';
@@ -50,7 +49,6 @@ export default function Home() {
   const [author, setAuthor] = useState('');
   const [meta, setMeta] = useState<{ provider: string; model: string } | null>(null);
   const [phaseLabel, setPhaseLabel] = useState('');
-  const [insights, setInsights] = useState<InsightsResult | null>(null);
   const [extraction, setExtraction] = useState<ExtractionResult | null>(null);
   const [verifications, setVerifications] = useState<Map<string, ClaimCardData>>(new Map());
   const [progress, setProgress] = useState({ done: 0, total: 0 });
@@ -68,7 +66,6 @@ export default function Home() {
     abortRef.current?.abort();
     setPhase('idle');
     setMeta(null);
-    setInsights(null);
     setExtraction(null);
     setVerifications(new Map());
     setProgress({ done: 0, total: 0 });
@@ -112,7 +109,9 @@ export default function Home() {
       setAuthor(fetched.author);
       setTranscript(fetched.transcript);
       if (fetched.asrUsed) {
-        setPhaseLabel(`✨ 已转写 ${fetched.asrLength} 字 · 进入声明拆解…`);
+        setPhaseLabel(`✨ 已转写 ${fetched.asrLength} 字 · 进入声明核查…`);
+      } else if (fetched.asrError) {
+        setPhaseLabel('⚠️ 视频音频提取失败，仅用 desc 核查...');
       }
       await new Promise((r) => setTimeout(r, 400));
       await runCheck(fetched.transcript, fetched.title, fetched.author);
@@ -176,10 +175,6 @@ export default function Home() {
             setPhaseLabel(p.label);
             if (typeof p.total === 'number') setProgress({ done: 0, total: p.total });
             setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
-          } else if (eventName === 'insights') {
-            setInsights(data as InsightsResult);
-          } else if (eventName === 'insights_error') {
-            // 静默失败，不阻塞核查
           } else if (eventName === 'extraction') {
             setExtraction(data as ExtractionResult);
           } else if (eventName === 'verification') {
@@ -260,38 +255,39 @@ export default function Home() {
                 transition={{ delay: 0.15 }}
                 className="inline-flex items-center gap-1.5 mb-5 px-3.5 h-7 rounded-full bg-[var(--color-duo-bg)] border-2 border-[var(--color-duo-light)]"
               >
-                <span className="text-[14px]">✨</span>
+                <span className="text-[14px]">⚡</span>
                 <span className="text-[11px] font-extrabold uppercase tracking-wider text-[var(--color-supported-text)]">
-                  AI 把视频变成你能用的东西
+                  AI 30 秒帮你拆穿营销号
                 </span>
               </motion.div>
 
-              {/* 主标题：从"打假"升级为"看完就能用" */}
+              {/* 主标题：场景化痛点 */}
               <motion.h1
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.22, duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
                 className="type-display text-text mb-5"
               >
-                看过的好视频，
+                老妈群里的「养生谣言」，
                 <br />
-                别再<span className="text-duo">刷完就忘</span>。
+                <span className="text-duo">30 秒</span>
+                帮你<span className="text-duo">拆穿</span>。
               </motion.h1>
 
-              {/* 副标题：覆盖三大能力 */}
+              {/* 副标题：差异化承诺 */}
               <motion.p
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.32 }}
-                className="text-[16px] sm:text-[18px] font-bold text-text-2 max-w-[640px] mx-auto leading-relaxed"
+                className="text-[16px] sm:text-[18px] font-bold text-text-2 max-w-[620px] mx-auto leading-relaxed"
               >
-                粘贴抖音链接，AI 帮你
-                <span className="text-text"> 抓重点 </span>·
-                <span className="text-text"> 做工具 </span>·
-                <span className="text-text"> 辨真假</span>。
+                不是简单标个真假 —— AI 给你
+                <span className="text-text"> 每句话的证据 </span>+
+                <span className="text-text"> 信源出处 </span>+
+                <span className="text-text"> 真相版本</span>。
                 <br className="hidden sm:block" />
                 <span className="text-text-3 text-[14px] sm:text-[16px]">
-                  让看过的内容，下次真的能用上 🎯
+                  把判断权还给你自己 ✓
                 </span>
               </motion.p>
             </div>
@@ -437,27 +433,37 @@ export default function Home() {
               </div>
             </motion.div>
 
+            {/* === 实时数据钩子（数字爬升）=== */}
+            <section className="mb-14">
+              <TickerStats />
+            </section>
+
             {/* === 痛点共鸣区 === */}
             <section className="mb-14">
               <div className="text-center mb-6">
                 <h2 className="type-title-1 text-text mb-2">
-                  你是不是<span className="text-duo">经常</span>这样？
+                  你是不是<span className="text-duo">经常</span>遇到？
                 </h2>
                 <p className="text-[14px] font-bold text-text-3">
-                  刷了那么多视频，最后真正用上的有几个？👀
+                  我们都被骗过，但下次可以不再被骗 👀
                 </p>
               </div>
               <PainPoints />
+            </section>
+
+            {/* === 互动 quiz 钩子（高转化）=== */}
+            <section className="mb-14">
+              <MythQuiz />
             </section>
 
             {/* === 4 个价值点 === */}
             <section className="mb-14">
               <div className="text-center mb-6">
                 <h2 className="type-title-1 text-text mb-2">
-                  凭什么用<span className="text-duo">我</span>？
+                  凭什么用<span className="text-duo">打假搭子</span>？
                 </h2>
                 <p className="text-[14px] font-bold text-text-3">
-                  和普通的笔记 / 收藏有什么不同 🤔
+                  和市面上的科普 / 辟谣账号有什么不同 🤔
                 </p>
               </div>
               <ValueProps />
@@ -472,9 +478,9 @@ export default function Home() {
               className="duo-card p-6 sm:p-8 mb-8 text-center bg-[var(--color-duo-bg)] border-[var(--color-duo)]"
             >
               <div className="text-4xl mb-3">🚀</div>
-              <h3 className="type-title-1 text-text mb-2">来一条试试？</h3>
-              <p className="text-[14px] font-bold text-text-2 mb-5 max-w-[420px] mx-auto">
-                把你最近刷到的那条抖音粘贴进来，AI 立刻帮你抓重点 · 做工具。
+              <h3 className="type-title-1 text-text mb-2">现在就核一条试试？</h3>
+              <p className="text-[14px] font-bold text-text-2 mb-5 max-w-[440px] mx-auto">
+                把你最近刷到、最想吐槽的那条抖音粘贴进来，AI 立即拆给你看。
               </p>
               <AppleButton
                 variant="primary"
@@ -489,7 +495,7 @@ export default function Home() {
                   }, 600);
                 }}
               >
-                立即解析一条 →
+                立即拆穿一条 →
               </AppleButton>
               <div className="text-[11px] font-bold text-text-3 mt-4">
                 免费 · 不用注册 · 30 秒出结果
@@ -535,7 +541,7 @@ export default function Home() {
                 </div>{/* status icon */}
                 <div className="flex-1 min-w-0">
                   <div className="text-[14px] font-extrabold text-text">
-                    {phase === 'done' ? '解析完成！' : phaseLabel || '准备中…'}
+                    {phase === 'done' ? '核查完成！' : phaseLabel || '准备中…'}
                   </div>
                   {meta && (
                     <div className="text-[11px] font-bold text-text-3 mt-0.5">
@@ -545,7 +551,7 @@ export default function Home() {
                 </div>
                 {phase === 'done' && (
                   <AppleButton variant="secondary" size="sm" onClick={reset}>
-                    再来一条
+                    再核一条
                   </AppleButton>
                 )}
               </div>
@@ -616,24 +622,6 @@ export default function Home() {
               </motion.div>
             )}
 
-            {/* 🎯 一图看懂（核心要点） */}
-            {insights && (
-              <div className="mb-6">
-                <InsightsPanel data={insights as InsightsData} />
-              </div>
-            )}
-
-            {/* 🛠️ 可立即使用的工具包 */}
-            {insights && (insights.toolkit.steps?.length || insights.toolkit.checklist?.length || insights.toolkit.reminders?.length) && (
-              <div className="mb-6">
-                <ToolKit
-                  type={insights.toolkit_type}
-                  title={insights.toolkit_title}
-                  toolkit={insights.toolkit}
-                />
-              </div>
-            )}
-
             {/* 声明列表 */}
             {extraction && (
               <div>
@@ -693,10 +681,10 @@ export default function Home() {
         <div className="max-w-[920px] mx-auto px-6 flex items-center justify-between flex-wrap gap-3">
           <div className="text-[12px] font-bold text-text-3 flex items-center gap-1.5">
             <span>🦉</span>
-            <span>打假搭子 · 抖音内容理解 AI</span>
+            <span>打假搭子 · 抖音内容核查 AI</span>
           </div>
           <div className="text-[11px] font-extrabold text-text-3 uppercase tracking-wider">
-            看过的视频，立刻能用 ✓
+            刷之前先核一下 ✓
           </div>
         </div>
       </footer>

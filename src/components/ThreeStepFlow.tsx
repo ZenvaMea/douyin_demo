@@ -12,21 +12,19 @@ const STEPS = [
   {
     n: '2',
     emoji: '🤖',
-    title: 'AI 处理',
-    desc: '抓重点 · 做工具 · 辨真假',
+    title: 'AI 拆解',
+    desc: '逐句声明 · 引用权威源',
   },
   {
     n: '3',
-    emoji: '📋',
-    title: '直接用上',
-    desc: '清单 · 步骤 · 一键复制',
+    emoji: '🚦',
+    title: '看真假',
+    desc: '三色证据 · 真相版本',
   },
 ];
 
 /**
- * 3 步流程示意图
- * 降低使用门槛的标志组件
- * 用箭头连接，强调"傻瓜操作"
+ * 3 步流程示意图（聚焦打假）
  */
 export function ThreeStepFlow() {
   return (
@@ -39,7 +37,6 @@ export function ThreeStepFlow() {
           transition={{ delay: 0.15 * i, type: 'spring', stiffness: 380, damping: 32 }}
           className="contents"
         >
-          {/* 卡片 */}
           <div className="duo-card p-4 flex items-center gap-3">
             <div className="relative flex-shrink-0">
               <div className="text-3xl">{s.emoji}</div>
@@ -53,7 +50,6 @@ export function ThreeStepFlow() {
             </div>
           </div>
 
-          {/* 箭头（最后一个不显示） */}
           {i < STEPS.length - 1 && (
             <div className="flex justify-center text-text-3 sm:rotate-0 rotate-90">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none">

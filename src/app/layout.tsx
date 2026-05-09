@@ -3,7 +3,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: '打假搭子 · Fact Buddy',
-  description: '抖音内容理解 AI · 看过的视频，立刻能用 🦉',
+  description: '抖音内容核查 AI · 别让营销号偷走你的判断 🦉',
 };
 
 export const viewport: Viewport = {
