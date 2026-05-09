@@ -347,7 +347,7 @@ export default function Home() {
                         onClick={handleExtractAndCheck}
                         disabled={!linkUrl.trim()}
                       >
-                        开始核查
+                        开始解析
                       </AppleButton>
                     </div>
                   </motion.div>
@@ -395,7 +395,7 @@ export default function Home() {
                         onClick={handleCheck}
                         disabled={transcript.trim().length < 10}
                       >
-                        开始核查
+                        开始解析
                       </AppleButton>
                     </div>
                   </motion.div>
@@ -441,23 +441,23 @@ export default function Home() {
             <section className="mb-14">
               <div className="text-center mb-6">
                 <h2 className="type-title-1 text-text mb-2">
-                  你是不是<span className="text-duo">经常</span>遇到？
+                  你是不是<span className="text-duo">经常</span>这样？
                 </h2>
                 <p className="text-[14px] font-bold text-text-3">
-                  我们都被骗过，但下次可以不再被骗 👀
+                  刷了那么多视频，最后真正用上的有几个？👀
                 </p>
               </div>
               <PainPoints />
             </section>
 
-            {/* === 4 个价值点（凭什么用我？） === */}
+            {/* === 4 个价值点 === */}
             <section className="mb-14">
               <div className="text-center mb-6">
                 <h2 className="type-title-1 text-text mb-2">
-                  凭什么用<span className="text-duo">打假搭子</span>？
+                  凭什么用<span className="text-duo">我</span>？
                 </h2>
                 <p className="text-[14px] font-bold text-text-3">
-                  和市面上的科普 / 辟谣账号有什么不同 🤔
+                  和普通的笔记 / 收藏有什么不同 🤔
                 </p>
               </div>
               <ValueProps />
@@ -472,9 +472,9 @@ export default function Home() {
               className="duo-card p-6 sm:p-8 mb-8 text-center bg-[var(--color-duo-bg)] border-[var(--color-duo)]"
             >
               <div className="text-4xl mb-3">🚀</div>
-              <h3 className="type-title-1 text-text mb-2">现在就核一条试试？</h3>
+              <h3 className="type-title-1 text-text mb-2">来一条试试？</h3>
               <p className="text-[14px] font-bold text-text-2 mb-5 max-w-[420px] mx-auto">
-                把你最近刷到、最想吐槽的那条抖音粘贴进来，AI 立即拆给你看。
+                把你最近刷到的那条抖音粘贴进来，AI 立刻帮你抓重点 · 做工具。
               </p>
               <AppleButton
                 variant="primary"
@@ -489,7 +489,7 @@ export default function Home() {
                   }, 600);
                 }}
               >
-                立即拆穿一条 →
+                立即解析一条 →
               </AppleButton>
               <div className="text-[11px] font-bold text-text-3 mt-4">
                 免费 · 不用注册 · 30 秒出结果
@@ -532,10 +532,10 @@ export default function Home() {
                   )}
                 >
                   {phase === 'done' ? '🎉' : <span className="animate-pulse-soft">🦉</span>}
-                </div>
+                </div>{/* status icon */}
                 <div className="flex-1 min-w-0">
                   <div className="text-[14px] font-extrabold text-text">
-                    {phase === 'done' ? '核查完成！' : phaseLabel || '准备中…'}
+                    {phase === 'done' ? '解析完成！' : phaseLabel || '准备中…'}
                   </div>
                   {meta && (
                     <div className="text-[11px] font-bold text-text-3 mt-0.5">
@@ -545,7 +545,7 @@ export default function Home() {
                 </div>
                 {phase === 'done' && (
                   <AppleButton variant="secondary" size="sm" onClick={reset}>
-                    再核一条
+                    再来一条
                   </AppleButton>
                 )}
               </div>
@@ -693,10 +693,10 @@ export default function Home() {
         <div className="max-w-[920px] mx-auto px-6 flex items-center justify-between flex-wrap gap-3">
           <div className="text-[12px] font-bold text-text-3 flex items-center gap-1.5">
             <span>🦉</span>
-            <span>打假搭子 · 抖音内容核查</span>
+            <span>打假搭子 · 抖音内容理解 AI</span>
           </div>
           <div className="text-[11px] font-extrabold text-text-3 uppercase tracking-wider">
-            刷之前先核一下 ✓
+            看过的视频，立刻能用 ✓
           </div>
         </div>
       </footer>
