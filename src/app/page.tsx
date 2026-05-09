@@ -414,25 +414,6 @@ export default function Home() {
               <ThreeStepFlow />
             </motion.div>
 
-            {/* === 经典翻车样例 === */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.55 }}
-              className="mb-12"
-            >
-              <div className="text-center mb-4">
-                <div className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-text-3">
-                  ✨ 试试这些经典翻车样例 ✨
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {Object.entries(samples).map(([key, sample], i) => (
-                  <SampleCard key={key} sample={sample} onClick={useSample} index={i} />
-                ))}
-              </div>
-            </motion.div>
-
             {/* === 实时数据钩子（数字爬升）=== */}
             <section className="mb-14">
               <TickerStats />
@@ -501,6 +482,23 @@ export default function Home() {
                 免费 · 不用注册 · 30 秒出结果
               </div>
             </motion.div>
+
+            {/* === 经典翻车样例（移到底部，作为补充）=== */}
+            <section className="mb-8">
+              <div className="text-center mb-5">
+                <h2 className="type-title-2 text-text mb-1.5">
+                  懒得复制链接？<span className="text-duo">点这里直接看效果</span>
+                </h2>
+                <p className="text-[12px] font-bold text-text-3">
+                  ✨ 三个经典翻车样例，一键体验 ✨
+                </p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {Object.entries(samples).map(([key, sample], i) => (
+                  <SampleCard key={key} sample={sample} onClick={useSample} index={i} />
+                ))}
+              </div>
+            </section>
 
             {/* === 错误提示 === */}
             {errorMsg && (
