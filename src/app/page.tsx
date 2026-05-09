@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Header } from '@/components/Header.tsx';
+import { HeroBackground } from '@/components/HeroBackground.tsx';
 import { AppleButton } from '@/components/AppleButton.tsx';
 import { SegmentedControl } from '@/components/SegmentedControl.tsx';
 import { SampleCard, type SampleData } from '@/components/SampleCard.tsx';
@@ -225,163 +226,251 @@ export default function Home() {
   const isWorking = phase === 'fetching' || phase === 'extracting' || phase === 'verifying';
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="relative min-h-screen overflow-x-hidden">
       <Header />
 
-      <main className="flex-1 max-w-[880px] mx-auto w-full px-6 py-12 sm:py-16">
-        {showInputArea && (
-          <motion.section
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.32, ease: [0.32, 0.72, 0, 1] }}
-          >
-            {/* Hero */}
-            <div className="mb-10 sm:mb-12">
-              <motion.div
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.08 }}
-                className="type-caption font-semibold text-system-blue uppercase tracking-[0.12em] mb-3"
-              >
-                Fact Buddy · 抖音内容核查
-              </motion.div>
-              <motion.h1
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.16 }}
-                className="type-display text-text mb-4 max-w-[640px]"
-              >
-                别让营销号
-                <span className="text-system-blue">骗</span>
-                走你的判断。
-              </motion.h1>
-              <motion.p
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.22 }}
-                className="type-title-2 text-text-2 font-normal max-w-[560px] leading-relaxed"
-              >
-                粘贴抖音视频链接或文案，AI 拆解关键声明，逐条核查信源，
-                <span className="text-text">不下结论，只摆证据</span>。
-              </motion.p>
-            </div>
+      {/* === Hero 区（输入 + 渐变光晕背景） === */}
+      {showInputArea && (
+        <section className="relative pt-[112px] pb-20 px-6">
+          <HeroBackground />
 
-            {/* 输入卡（Liquid Glass） */}
+          <div className="relative max-w-[920px] mx-auto">
+            {/* === 状态徽章 === */}
             <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="flex justify-center mb-8"
+            >
+              <div className="inline-flex items-center gap-2 px-3.5 h-8 rounded-full glass-subtle">
+                <div
+                  className="w-1.5 h-1.5 rounded-full"
+                  style={{
+                    background: '#7C5CFF',
+                    boxShadow: '0 0 10px #7C5CFF',
+                  }}
+                />
+                <span className="text-[12px] font-medium text-text-2 tracking-tight">
+                  AI 实时拆解 · 三色证据核查
+                </span>
+              </div>
+            </motion.div>
+
+            {/* === 巨大标题 === */}
+            <motion.h1
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.1, ease: [0.32, 0.72, 0, 1] }}
+              className="type-display text-center mx-auto max-w-[860px] mb-6"
+            >
+              <span className="block text-text">别让营销号</span>
+              <span
+                className="block"
+                style={{
+                  background: 'linear-gradient(90deg, #B59FFF 0%, #7C5CFF 40%, #4A6FFF 80%, #5AC8FA 100%)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  paddingBottom: '0.1em',
+                }}
+              >
+                偷走你的判断。
+              </span>
+            </motion.h1>
+
+            {/* === 副标题 === */}
+            <motion.p
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, type: 'spring', stiffness: 380, damping: 32 }}
-              className="glass-thick rounded-[20px] p-5 mb-6 shadow-apple-md"
+              transition={{ duration: 0.6, delay: 0.25 }}
+              className="text-center text-[18px] sm:text-[20px] text-text-2 max-w-[640px] mx-auto mb-12 leading-relaxed font-normal"
             >
-              {/* Segmented */}
-              <div className="flex items-center justify-between mb-4">
+              粘贴抖音视频链接，AI 拆解每一句声明，引用权威信源逐条核查。
+              <br className="hidden sm:block" />
+              <span className="text-text font-medium">不下结论，只摆证据</span>。
+            </motion.p>
+
+            {/* === 玻璃输入卡 === */}
+            <motion.div
+              initial={{ opacity: 0, y: 16, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.7, delay: 0.4, ease: [0.32, 0.72, 0, 1] }}
+              className="glass-strong rounded-[20px] p-2 mb-6 relative"
+            >
+              {/* 顶部渐变线 */}
+              <div
+                className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px"
+                style={{
+                  background:
+                    'linear-gradient(90deg, transparent 0%, rgba(124, 92, 255, 0.6) 50%, transparent 100%)',
+                }}
+              />
+
+              {/* Tab 切换 */}
+              <div className="flex items-center justify-between p-3 pb-1">
                 <SegmentedControl
                   options={[
-                    { value: 'link', label: <><span>🔗</span><span>抖音链接</span></> },
-                    { value: 'paste', label: <><span>📝</span><span>粘贴文案</span></> },
+                    {
+                      value: 'link',
+                      label: (
+                        <>
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                            <path
+                              d="M10 14a5 5 0 007.07 0l3-3a5 5 0 00-7.07-7.07L11.5 5.5M14 10a5 5 0 00-7.07 0l-3 3a5 5 0 007.07 7.07L12.5 18.5"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                          抖音链接
+                        </>
+                      ),
+                    },
+                    {
+                      value: 'paste',
+                      label: (
+                        <>
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                            <path
+                              d="M9 3h6a2 2 0 012 2v0a2 2 0 01-2 2H9a2 2 0 01-2-2v0a2 2 0 012-2zM7 5H5a2 2 0 00-2 2v13a2 2 0 002 2h14a2 2 0 002-2V7a2 2 0 00-2-2h-2"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                          粘贴文案
+                        </>
+                      ),
+                    },
                   ]}
                   value={mode}
                   onChange={setMode}
                 />
+                {meta && (
+                  <div className="hidden sm:flex items-center gap-1.5 text-[11px] text-text-3 font-mono px-2">
+                    <span className="w-1 h-1 rounded-full bg-success" />
+                    {meta.provider}
+                  </div>
+                )}
               </div>
 
               {/* 输入区切换 */}
-              <AnimatePresence mode="wait">
-                {mode === 'link' ? (
-                  <motion.div
-                    key="link"
-                    initial={{ opacity: 0, y: 4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -4 }}
-                    transition={{ duration: 0.2 }}
-                    className="space-y-4"
-                  >
-                    <input
-                      type="url"
-                      placeholder="https://v.douyin.com/xxx 或完整视频链接"
-                      value={linkUrl}
-                      onChange={(e) => setLinkUrl(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && linkUrl.trim()) handleExtractAndCheck();
-                      }}
-                      className="apple-input"
-                      autoComplete="off"
-                    />
-                    <div className="flex items-center justify-between gap-3 flex-wrap">
-                      <div className="type-caption text-text-3 flex items-center gap-1.5">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+              <div className="p-3 pt-2">
+                <AnimatePresence mode="wait">
+                  {mode === 'link' ? (
+                    <motion.div
+                      key="link"
+                      initial={{ opacity: 0, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      transition={{ duration: 0.18 }}
+                      className="space-y-3"
+                    >
+                      <div className="relative">
+                        <input
+                          type="url"
+                          placeholder="https://v.douyin.com/xxx 或完整视频链接"
+                          value={linkUrl}
+                          onChange={(e) => setLinkUrl(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && linkUrl.trim()) handleExtractAndCheck();
+                          }}
+                          className="dark-input pr-32"
+                          autoComplete="off"
+                        />
+                        <div className="absolute right-1.5 top-1/2 -translate-y-1/2">
+                          <AppleButton
+                            variant="primary"
+                            size="md"
+                            onClick={handleExtractAndCheck}
+                            disabled={!linkUrl.trim()}
+                            iconRight={
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                <path
+                                  d="M5 12h14M13 5l7 7-7 7"
+                                  stroke="currentColor"
+                                  strokeWidth="2.4"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                            }
+                          >
+                            开始核查
+                          </AppleButton>
+                        </div>
+                      </div>
+                      <div className="text-[12px] text-text-3 flex items-center gap-1.5 px-1">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
                           <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" />
                           <path d="M12 8v4M12 16h.01" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                         </svg>
-                        从抖音 App 点「分享 → 复制链接」即可
+                        从抖音 App 点「分享 → 复制链接」即可，自动转写视频音频
                       </div>
-                      <AppleButton
-                        variant="filled"
-                        size="lg"
-                        onClick={handleExtractAndCheck}
-                        disabled={!linkUrl.trim()}
-                      >
-                        开始核查
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                          <path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                      </AppleButton>
-                    </div>
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="paste"
-                    initial={{ opacity: 0, y: 4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -4 }}
-                    transition={{ duration: 0.2 }}
-                    className="space-y-3"
-                  >
-                    <div className="grid grid-cols-2 gap-3">
-                      <input
-                        type="text"
-                        placeholder="视频标题（可选）"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        className="apple-input"
-                      />
-                      <input
-                        type="text"
-                        placeholder="作者（可选）"
-                        value={author}
-                        onChange={(e) => setAuthor(e.target.value)}
-                        className="apple-input"
-                      />
-                    </div>
-                    <textarea
-                      placeholder="粘贴视频文案到这里…"
-                      value={transcript}
-                      onChange={(e) => setTranscript(e.target.value)}
-                      rows={6}
-                      className="apple-input"
-                    />
-                    <div className="flex items-center justify-between gap-3 flex-wrap">
-                      <div className="type-caption text-text-3 tabular-nums">
-                        {transcript.length} 字 · 至少 10 字
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="paste"
+                      initial={{ opacity: 0, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      transition={{ duration: 0.18 }}
+                      className="space-y-3"
+                    >
+                      <div className="grid grid-cols-2 gap-2">
+                        <input
+                          type="text"
+                          placeholder="视频标题（可选）"
+                          value={title}
+                          onChange={(e) => setTitle(e.target.value)}
+                          className="dark-input"
+                          style={{ height: 40 }}
+                        />
+                        <input
+                          type="text"
+                          placeholder="作者（可选）"
+                          value={author}
+                          onChange={(e) => setAuthor(e.target.value)}
+                          className="dark-input"
+                          style={{ height: 40 }}
+                        />
                       </div>
-                      <AppleButton
-                        variant="filled"
-                        size="lg"
-                        onClick={handleCheck}
-                        disabled={transcript.trim().length < 10}
-                      >
-                        开始核查
-                      </AppleButton>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                      <textarea
+                        placeholder="粘贴视频文案到这里…"
+                        value={transcript}
+                        onChange={(e) => setTranscript(e.target.value)}
+                        rows={5}
+                        className="dark-input"
+                      />
+                      <div className="flex items-center justify-between gap-3 flex-wrap">
+                        <div className="text-[12px] text-text-3 tabular-nums">
+                          {transcript.length} 字 · 至少 10 字
+                        </div>
+                        <AppleButton
+                          variant="primary"
+                          size="lg"
+                          onClick={handleCheck}
+                          disabled={transcript.trim().length < 10}
+                        >
+                          开始核查
+                        </AppleButton>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </motion.div>
 
-            {/* 示例 */}
-            <div>
-              <div className="type-caption font-semibold uppercase tracking-[0.12em] text-text-3 mb-3">
-                试试这些经典翻车样例
+            {/* === 示例样本 === */}
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.55 }}
+            >
+              <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-text-3 mb-3 text-center">
+                ✦ 经典翻车样例
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {Object.entries(samples).map(([key, sample], i) => (
@@ -390,68 +479,91 @@ export default function Home() {
                     sample={sample}
                     onClick={useSample}
                     index={i}
-                    tint={SAMPLE_TINT[key] ?? 'blue'}
+                    tint={SAMPLE_TINT[key] ?? 'purple'}
                   />
                 ))}
               </div>
-            </div>
+            </motion.div>
 
+            {/* === 错误提示 === */}
             {errorMsg && (
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-6 apple-card p-4 border-l-[3px] border-system-red"
-                style={{ borderLeftColor: '#FF3B30' }}
+                className="mt-6 card p-4 relative overflow-hidden"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(255,92,92,0.10) 0%, rgba(255,255,255,0.03) 100%)',
+                  boxShadow: 'inset 0 0 0 1px rgba(255,92,92,0.25)',
+                }}
               >
-                <div className="type-callout font-semibold text-[var(--color-refuted-text)] mb-1">
+                <div className="text-[12px] font-semibold uppercase tracking-[0.1em] text-[#FF8585] mb-1">
                   提取失败
                 </div>
-                <div className="type-body text-text-2">{errorMsg}</div>
+                <div className="text-[14px] text-text-2">{errorMsg}</div>
               </motion.div>
             )}
-          </motion.section>
-        )}
+          </div>
+        </section>
+      )}
 
-        {/* 结果区 */}
-        {(isWorking || phase === 'done') && (
-          <section ref={resultRef}>
+      {/* === 结果区 === */}
+      {(isWorking || phase === 'done') && (
+        <section ref={resultRef} className="relative pt-[88px] pb-16 px-6">
+          {/* 顶部仍保留弱化的渐变背景，避免突兀 */}
+          <div className="absolute top-0 left-0 right-0 h-[400px] pointer-events-none -z-10">
+            <HeroBackground />
+          </div>
+
+          <div className="relative max-w-[920px] mx-auto">
             {/* 状态条 */}
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              className="apple-card p-4 mb-5"
+              className="card p-4 mb-6 glass"
             >
               <div className="flex items-center gap-3">
                 {phase === 'done' ? (
-                  <div className="w-9 h-9 rounded-full bg-[var(--color-supported-bg)] flex items-center justify-center flex-shrink-0">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-[var(--color-supported-text)]">
-                      <path d="M5 12.5l5 5 9-11" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{
+                      background: 'rgba(63,207,142,0.15)',
+                      boxShadow: 'inset 0 0 0 1px rgba(63,207,142,0.3)',
+                    }}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-[#5BE9A9]">
+                      <path d="M5 12.5l5 5 9-11" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
                 ) : (
-                  <div className="w-9 h-9 rounded-full bg-system-blue/10 flex items-center justify-center flex-shrink-0">
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{
+                      background: 'rgba(124,92,255,0.15)',
+                      boxShadow: 'inset 0 0 0 1px rgba(124,92,255,0.3)',
+                    }}
+                  >
                     <motion.div
                       animate={{ rotate: 360 }}
                       transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
                     >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-system-blue">
-                        <path d="M21 12a9 9 0 11-9-9" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-[#B59FFF]">
+                        <path d="M21 12a9 9 0 11-9-9" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
                       </svg>
                     </motion.div>
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <div className="type-callout font-semibold text-text">
+                  <div className="text-[14px] font-semibold text-text">
                     {phase === 'done' ? '核查完成' : phaseLabel || '准备中…'}
                   </div>
                   {meta && (
-                    <div className="type-caption text-text-3 mt-0.5">
+                    <div className="text-[11px] text-text-3 mt-0.5 font-mono tracking-tight">
                       {meta.provider} · {meta.model}
                     </div>
                   )}
                 </div>
                 {phase === 'done' && (
-                  <AppleButton variant="gray" size="sm" onClick={reset}>
+                  <AppleButton variant="secondary" size="sm" onClick={reset}>
                     再核一条
                   </AppleButton>
                 )}
@@ -472,39 +584,65 @@ export default function Home() {
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="apple-card-elevated p-6 mb-6"
+                className="card-elevated p-7 mb-6 relative overflow-hidden"
               >
-                <div className="flex flex-col sm:flex-row gap-6 items-center">
+                {/* 顶部装饰渐变 */}
+                <div
+                  className="absolute top-0 left-0 right-0 h-px"
+                  style={{
+                    background:
+                      'linear-gradient(90deg, transparent 0%, rgba(124, 92, 255, 0.5) 50%, transparent 100%)',
+                  }}
+                />
+
+                <div className="flex flex-col sm:flex-row gap-7 items-center">
                   {phase === 'done' && verifications.size > 0 && (
                     <div className="flex-shrink-0">
-                      <CredibilityRing score={computedScore} size={170} />
+                      <CredibilityRing score={computedScore} size={180} />
                     </div>
                   )}
                   <div className="flex-1 min-w-0 text-center sm:text-left">
-                    <div className="type-caption text-text-3 uppercase tracking-[0.12em] mb-2">
+                    <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-text-3 mb-3">
                       视频内容
                     </div>
                     {title && (
-                      <div className="type-title-2 text-text mb-1.5 leading-tight">{title}</div>
+                      <div className="text-[22px] sm:text-[26px] font-semibold text-text mb-2 leading-tight tracking-tight">
+                        {title}
+                      </div>
                     )}
-                    {author && <div className="type-callout text-system-blue mb-3">{author}</div>}
-                    <div className="type-body text-text-2 mb-3">{extraction.summary}</div>
+                    {author && (
+                      <div className="text-[14px] text-[#B59FFF] mb-4 font-medium">
+                        @{author}
+                      </div>
+                    )}
+                    <div className="text-[14px] text-text-2 mb-4 leading-relaxed">
+                      {extraction.summary}
+                    </div>
                     {phase === 'done' && (
-                      <div className="flex items-center gap-3 flex-wrap justify-center sm:justify-start type-caption font-semibold">
-                        <span className="flex items-center gap-1.5 text-[var(--color-supported-text)]">
-                          <span className="w-2 h-2 rounded-full bg-[var(--color-supported-bar)]" />
+                      <div className="flex items-center gap-4 flex-wrap justify-center sm:justify-start text-[12px] font-medium">
+                        <span className="flex items-center gap-2 text-[#5BE9A9]">
+                          <span
+                            className="w-1.5 h-1.5 rounded-full"
+                            style={{ background: '#3FCF8E', boxShadow: '0 0 8px #3FCF8E' }}
+                          />
                           已验证 {counts.SUPPORTED}
                         </span>
-                        <span className="flex items-center gap-1.5 text-[var(--color-nei-text)]">
-                          <span className="w-2 h-2 rounded-full bg-[var(--color-nei-bar)]" />
+                        <span className="flex items-center gap-2 text-[#FFC85C]">
+                          <span
+                            className="w-1.5 h-1.5 rounded-full"
+                            style={{ background: '#FFB224', boxShadow: '0 0 8px #FFB224' }}
+                          />
                           存疑 {counts.NEI}
                         </span>
-                        <span className="flex items-center gap-1.5 text-[var(--color-refuted-text)]">
-                          <span className="w-2 h-2 rounded-full bg-[var(--color-refuted-bar)]" />
+                        <span className="flex items-center gap-2 text-[#FF8585]">
+                          <span
+                            className="w-1.5 h-1.5 rounded-full"
+                            style={{ background: '#FF5C5C', boxShadow: '0 0 8px #FF5C5C' }}
+                          />
                           误导 {counts.REFUTED}
                         </span>
                         <span className="text-text-3">
-                          · 已剔除 {extraction.discarded_segments.length} 段营销
+                          已剔除 {extraction.discarded_segments.length} 段营销
                         </span>
                       </div>
                     )}
@@ -516,9 +654,11 @@ export default function Home() {
             {/* 声明列表 */}
             {extraction && (
               <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="type-headline text-text">核查报告</div>
-                  <div className="type-caption text-text-3">点击展开查看证据</div>
+                <div className="flex items-center justify-between mb-5">
+                  <div className="text-[15px] font-semibold text-text">核查报告</div>
+                  <div className="text-[11px] text-text-3 uppercase tracking-[0.12em]">
+                    点击展开查看证据
+                  </div>
                 </div>
                 <div className="space-y-2.5">
                   <AnimatePresence mode="popLayout">
@@ -533,23 +673,22 @@ export default function Home() {
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           transition={{ delay: idx * 0.04 }}
-                          className="apple-card p-4 opacity-60"
+                          className="card p-4 opacity-50"
                         >
                           <div className="flex items-center gap-3">
                             <motion.div
                               animate={{ rotate: 360 }}
                               transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
-                              className="w-4 h-4"
                             >
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-text-3">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-text-3">
                                 <path d="M21 12a9 9 0 11-9-9" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
                               </svg>
                             </motion.div>
                             <div className="flex-1">
-                              <div className="type-caption text-text-3 mb-0.5">
+                              <div className="text-[10px] font-mono text-text-3 uppercase tracking-[0.1em] mb-0.5">
                                 {claim.id} · 核查中
                               </div>
-                              <div className="type-callout font-medium text-text">{claim.text}</div>
+                              <div className="text-[14px] font-medium text-text">{claim.text}</div>
                             </div>
                           </div>
                         </motion.div>
@@ -559,17 +698,25 @@ export default function Home() {
                 </div>
               </div>
             )}
-          </section>
-        )}
-      </main>
-
-      <footer className="py-10 border-t border-separator">
-        <div className="max-w-[880px] mx-auto px-6 flex items-center justify-between flex-wrap gap-3">
-          <div className="type-caption text-text-3">
-            打假搭子 · 抖音精选内容核查
           </div>
-          <div className="type-caption text-text-3">
-            不下结论 · 只摆证据
+        </section>
+      )}
+
+      {/* === Footer === */}
+      <footer className="relative py-10 mt-12">
+        <div
+          className="absolute top-0 left-0 right-0 h-px"
+          style={{
+            background:
+              'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%)',
+          }}
+        />
+        <div className="max-w-[920px] mx-auto px-6 flex items-center justify-between flex-wrap gap-3">
+          <div className="text-[12px] text-text-3">
+            打假搭子 <span className="text-text-3/60">·</span> 抖音精选内容核查
+          </div>
+          <div className="text-[12px] text-text-3 font-mono">
+            built with ◆ Claude Code
           </div>
         </div>
       </footer>

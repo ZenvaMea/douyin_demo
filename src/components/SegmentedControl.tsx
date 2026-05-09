@@ -14,7 +14,6 @@ interface SegmentedControlProps<T extends string> {
   value: T;
   onChange: (value: T) => void;
   fullWidth?: boolean;
-  /** 用于 layoutId 区分多个 SegmentedControl 实例 */
   layoutId?: string;
 }
 
@@ -28,7 +27,8 @@ export function SegmentedControl<T extends string>({
   return (
     <div
       className={cn(
-        'inline-flex p-1 rounded-[10px] bg-gray-200/60 relative',
+        'inline-flex p-1 rounded-[10px] bg-white/[0.04] relative',
+        'shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]',
         fullWidth && 'flex w-full',
       )}
     >
@@ -38,16 +38,16 @@ export function SegmentedControl<T extends string>({
           type="button"
           onClick={() => onChange(opt.value)}
           className={cn(
-            'relative z-10 px-4 h-8 rounded-[7px] flex items-center justify-center gap-1.5',
-            'type-callout font-semibold transition-colors',
+            'relative z-10 px-4 h-9 rounded-[8px] flex items-center justify-center gap-1.5',
+            'text-[13px] font-medium transition-colors',
             fullWidth && 'flex-1',
-            value === opt.value ? 'text-text' : 'text-text-2 hover:text-text',
+            value === opt.value ? 'text-text' : 'text-text-3 hover:text-text-2',
           )}
         >
           {value === opt.value && (
             <motion.div
               layoutId={layoutId}
-              className="absolute inset-0 bg-surface rounded-[7px] shadow-apple-xs"
+              className="absolute inset-0 bg-white/[0.08] rounded-[8px] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.1)]"
               transition={{ type: 'spring', stiffness: 380, damping: 32, mass: 0.8 }}
             />
           )}
