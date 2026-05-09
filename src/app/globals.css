@@ -1,203 +1,310 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
 @import "tailwindcss";
 
 /**
- * 打假搭子 · 多邻国风格主题
- * 参考 Duolingo 官方品牌色板
+ * 打假搭子 · Apple HIG 主题
+ * 参考：macOS Sonoma + iOS 18 + 局部 Liquid Glass
+ * 调性：Apple Health 数据严肃感 + Notes 留白克制
  */
+
 @theme {
-  /* === 主色（Duolingo Owl Green） === */
-  --color-duo-green: #58cc02;
-  --color-duo-green-hover: #61e002;
-  --color-duo-green-shadow: #58a700;
-  --color-duo-green-light: #d7ffb8;
-  --color-duo-green-bg: #f7ffeb;
+  /* === Apple System Colors === */
+  --color-system-blue: #007AFF;
+  --color-system-blue-dark: #0A84FF;
+  --color-system-green: #34C759;
+  --color-system-green-dark: #30D158;
+  --color-system-orange: #FF9500;
+  --color-system-orange-dark: #FF9F0A;
+  --color-system-red: #FF3B30;
+  --color-system-red-dark: #FF453A;
+  --color-system-purple: #AF52DE;
+  --color-system-pink: #FF2D55;
+  --color-system-yellow: #FFCC00;
+  --color-system-teal: #5AC8FA;
 
-  /* === 辅色 === */
-  --color-duo-blue: #1cb0f6;
-  --color-duo-blue-shadow: #1899d6;
-  --color-duo-blue-light: #ddf4ff;
+  /* === Neutral (macOS Sonoma) === */
+  --color-gray-50:  #FAFAFA;
+  --color-gray-100: #F2F2F7;
+  --color-gray-200: #E5E5EA;
+  --color-gray-300: #D1D1D6;
+  --color-gray-400: #C7C7CC;
+  --color-gray-500: #AEAEB2;
+  --color-gray-600: #8E8E93;
+  --color-gray-700: #636366;
+  --color-gray-800: #3A3A3C;
+  --color-gray-900: #1C1C1E;
 
-  --color-duo-yellow: #ffc800;
-  --color-duo-yellow-shadow: #e6b400;
-  --color-duo-yellow-light: #fff9d6;
+  /* === Semantic Tokens === */
+  --color-bg: #F2F2F7;
+  --color-surface: #FFFFFF;
+  --color-surface-elevated: rgba(255, 255, 255, 0.72);
+  --color-border: rgba(60, 60, 67, 0.12);
+  --color-separator: rgba(60, 60, 67, 0.08);
+  --color-text: #1C1C1E;
+  --color-text-2: #3C3C43;
+  --color-text-3: rgba(60, 60, 67, 0.6);
+  --color-text-disabled: rgba(60, 60, 67, 0.3);
 
-  --color-duo-red: #ff4b4b;
-  --color-duo-red-shadow: #ea2b2b;
-  --color-duo-red-light: #ffdfe0;
+  /* === 三色 Indicator (subtle) === */
+  --color-supported-bg: rgba(52, 199, 89, 0.08);
+  --color-supported-bar: #34C759;
+  --color-supported-text: #248A3D;
 
-  --color-duo-purple: #ce82ff;
-  --color-duo-purple-shadow: #b15adb;
-  --color-duo-purple-light: #f3e3ff;
+  --color-nei-bg: rgba(255, 149, 0, 0.08);
+  --color-nei-bar: #FF9500;
+  --color-nei-text: #C77600;
 
-  /* === 中性色 === */
-  --color-duo-eel: #4b4b4b;
-  --color-duo-wolf: #777777;
-  --color-duo-hare: #afafaf;
-  --color-duo-swan: #e5e5e5;
-  --color-duo-snow: #f7f7f7;
-  --color-duo-feather: #e5e5e5;
+  --color-refuted-bg: rgba(255, 59, 48, 0.08);
+  --color-refuted-bar: #FF3B30;
+  --color-refuted-text: #D70015;
 
-  /* === 字体 === */
-  --font-display: "Nunito", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
-  --font-body: "Nunito", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  /* === Font === */
+  --font-sans: var(--font-geist-sans), 'SF Pro Display', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif;
+  --font-mono: var(--font-geist-mono), 'SF Mono', ui-monospace, monospace;
+
+  /* === Radius === */
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
+
+  /* === Easing === */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-emphasized: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-decelerate: cubic-bezier(0, 0, 0.2, 1);
 }
 
+/* === Base === */
 * {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 html, body {
-  background: #ffffff;
-  color: #4b4b4b;
-  font-family: var(--font-body);
-  font-weight: 600;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-feature-settings: 'cv11', 'ss01', 'ss03';
   letter-spacing: -0.01em;
 }
 
-/* === 多邻国 3D 按钮基础类 === */
-.duo-btn {
+/* === Apple Type Scale === */
+.type-display { font-size: 44px; line-height: 52px; font-weight: 700; letter-spacing: -0.022em; }
+.type-title-1 { font-size: 28px; line-height: 34px; font-weight: 600; letter-spacing: -0.019em; }
+.type-title-2 { font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -0.017em; }
+.type-headline { font-size: 17px; line-height: 22px; font-weight: 600; letter-spacing: -0.014em; }
+.type-body { font-size: 15px; line-height: 22px; font-weight: 400; letter-spacing: -0.01em; }
+.type-callout { font-size: 14px; line-height: 20px; font-weight: 500; letter-spacing: -0.008em; }
+.type-caption { font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0; }
+
+@media (max-width: 640px) {
+  .type-display { font-size: 32px; line-height: 40px; }
+  .type-title-1 { font-size: 24px; line-height: 30px; }
+}
+
+/* === Apple Hairline (0.5px border via shadow，避免高 DPR 加粗) === */
+.hairline {
+  box-shadow: 0 0 0 0.5px var(--color-border);
+}
+
+/* === Apple Shadows (极克制) === */
+.shadow-apple-xs {
+  box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+.shadow-apple-sm {
+  box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.05), 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+.shadow-apple-md {
+  box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+.shadow-apple-lg {
+  box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.06), 0 20px 48px rgba(0, 0, 0, 0.12);
+}
+
+/* === Liquid Glass (vibrancy) === */
+.glass {
+  background: rgba(255, 255, 255, 0.62);
+  backdrop-filter: saturate(180%) blur(24px);
+  -webkit-backdrop-filter: saturate(180%) blur(24px);
+  box-shadow:
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.4),
+    0 8px 32px rgba(0, 0, 0, 0.06);
+}
+
+.glass-thick {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: saturate(200%) blur(40px);
+  -webkit-backdrop-filter: saturate(200%) blur(40px);
+}
+
+.glass-thin {
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: saturate(150%) blur(16px);
+  -webkit-backdrop-filter: saturate(150%) blur(16px);
+}
+
+/* === Header sticky vibrancy === */
+.header-glass {
+  background: rgba(242, 242, 247, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+
+/* === Inputs (iOS-style focus) === */
+.apple-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 12px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  outline: none;
+  border: none;
+  box-shadow: inset 0 0 0 1px var(--color-border);
+  transition: box-shadow 150ms var(--ease-standard);
+}
+
+.apple-input:focus {
+  box-shadow: inset 0 0 0 2px var(--color-system-blue);
+}
+
+.apple-input::placeholder {
+  color: var(--color-text-3);
+}
+
+textarea.apple-input {
+  height: auto;
+  padding: 14px 16px;
+  resize: none;
+  line-height: 22px;
+}
+
+/* === Apple Buttons === */
+.btn-base {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  border-radius: 16px;
-  padding: 14px 24px;
-  cursor: pointer;
-  transition: filter 0.15s, transform 0.05s;
-  user-select: none;
+  gap: 6px;
+  font-family: inherit;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   border: none;
-  position: relative;
-  font-family: var(--font-display);
+  outline: none;
+  cursor: pointer;
+  user-select: none;
+  transition: all 150ms var(--ease-standard);
 }
 
-.duo-btn:active:not(:disabled) {
-  transform: translateY(2px);
-  box-shadow: 0 0 0 currentColor !important;
+.btn-base:active:not(:disabled) {
+  transform: scale(0.97);
 }
 
-.duo-btn:disabled {
-  opacity: 0.5;
+.btn-base:disabled {
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
-/* 主按钮（绿色） */
-.duo-btn-primary {
-  background: var(--color-duo-green);
+.btn-filled {
+  background: var(--color-system-blue);
   color: white;
-  box-shadow: 0 4px 0 var(--color-duo-green-shadow);
 }
-.duo-btn-primary:hover:not(:disabled) {
-  filter: brightness(1.05);
-}
-
-/* 次按钮（蓝色） */
-.duo-btn-secondary {
-  background: var(--color-duo-blue);
-  color: white;
-  box-shadow: 0 4px 0 var(--color-duo-blue-shadow);
-}
-.duo-btn-secondary:hover:not(:disabled) {
-  filter: brightness(1.05);
+.btn-filled:hover:not(:disabled) {
+  background: #0070E5;
 }
 
-/* 幽灵按钮（白底） */
-.duo-btn-ghost {
-  background: white;
-  color: var(--color-duo-eel);
-  box-shadow: 0 2px 0 var(--color-duo-swan);
-  border: 2px solid var(--color-duo-swan);
+.btn-tinted {
+  background: rgba(0, 122, 255, 0.1);
+  color: var(--color-system-blue);
 }
-.duo-btn-ghost:hover:not(:disabled) {
-  background: var(--color-duo-snow);
+.btn-tinted:hover:not(:disabled) {
+  background: rgba(0, 122, 255, 0.16);
 }
 
-/* === 多邻国卡片 === */
-.duo-card {
-  background: white;
-  border: 2px solid var(--color-duo-swan);
-  border-radius: 20px;
-  padding: 20px;
-  transition: border-color 0.2s;
+.btn-plain {
+  background: transparent;
+  color: var(--color-system-blue);
+}
+.btn-plain:hover:not(:disabled) {
+  background: rgba(0, 122, 255, 0.08);
 }
 
-.duo-card-green { border-color: var(--color-duo-green); background: var(--color-duo-green-bg); }
-.duo-card-yellow { border-color: var(--color-duo-yellow); background: var(--color-duo-yellow-light); }
-.duo-card-red { border-color: var(--color-duo-red); background: var(--color-duo-red-light); }
-.duo-card-blue { border-color: var(--color-duo-blue); background: var(--color-duo-blue-light); }
-
-/* === 多邻国进度环（用于可信度评分） === */
-.duo-progress-track {
-  stroke: var(--color-duo-swan);
+.btn-gray {
+  background: var(--color-gray-100);
+  color: var(--color-text);
+  box-shadow: inset 0 0 0 0.5px var(--color-border);
 }
-.duo-progress-bar-green { stroke: var(--color-duo-green); }
-.duo-progress-bar-yellow { stroke: var(--color-duo-yellow); }
-.duo-progress-bar-red { stroke: var(--color-duo-red); }
+.btn-gray:hover:not(:disabled) {
+  background: var(--color-gray-200);
+}
 
-/* === 文本输入框 === */
-.duo-input {
-  width: 100%;
-  border: 2px solid var(--color-duo-swan);
+/* sizes */
+.btn-sm { height: 32px; padding: 0 14px; font-size: 13px; border-radius: 8px; }
+.btn-md { height: 38px; padding: 0 18px; font-size: 14px; border-radius: 10px; }
+.btn-lg { height: 48px; padding: 0 24px; font-size: 15px; border-radius: 12px; }
+.btn-xl { height: 56px; padding: 0 28px; font-size: 17px; border-radius: 14px; }
+
+/* === Apple Card === */
+.apple-card {
+  background: var(--color-surface);
   border-radius: 16px;
-  padding: 16px 20px;
-  background: white;
-  color: var(--color-duo-eel);
-  font-family: var(--font-body);
-  font-weight: 600;
-  font-size: 16px;
-  outline: none;
-  transition: border-color 0.15s, box-shadow 0.15s;
-  resize: none;
-}
-.duo-input:focus {
-  border-color: var(--color-duo-blue);
-  box-shadow: 0 0 0 4px var(--color-duo-blue-light);
+  box-shadow: 0 0 0 0.5px var(--color-border), 0 1px 2px rgba(0, 0, 0, 0.03);
 }
 
-/* === 标签徽章 === */
-.duo-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  padding: 4px 10px;
-  border-radius: 8px;
+.apple-card-elevated {
+  background: var(--color-surface);
+  border-radius: 20px;
+  box-shadow: 0 0 0 0.5px var(--color-border), 0 8px 24px rgba(0, 0, 0, 0.06);
 }
 
-.duo-badge-green { background: var(--color-duo-green); color: white; }
-.duo-badge-yellow { background: var(--color-duo-yellow); color: white; }
-.duo-badge-red { background: var(--color-duo-red); color: white; }
-.duo-badge-blue { background: var(--color-duo-blue); color: white; }
-.duo-badge-gray { background: var(--color-duo-hare); color: white; }
-
-/* === 滚动条 === */
+/* === Apple Scrollbar === */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-duo-swan);
+  background: var(--color-gray-300);
   border-radius: 4px;
 }
-::-webkit-scrollbar-thumb:hover { background: var(--color-duo-hare); }
+::-webkit-scrollbar-thumb:hover { background: var(--color-gray-400); }
 
-/* 回弹动画 */
-@keyframes pop-in {
-  0% { transform: scale(0.95); opacity: 0; }
-  60% { transform: scale(1.02); opacity: 1; }
-  100% { transform: scale(1); }
+/* === Animations === */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
-.animate-pop-in { animation: pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.animate-fade-in { animation: fade-in 200ms var(--ease-standard) both; }
 
 @keyframes fade-up {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
-.animate-fade-up { animation: fade-up 0.3s ease-out both; }
+.animate-fade-up { animation: fade-up 320ms var(--ease-emphasized) both; }
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-scale-in { animation: scale-in 320ms var(--ease-emphasized) both; }
+
+/* === Reduced motion === */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* === Utilities for Tailwind compose === */
+.text-text { color: var(--color-text); }
+.text-text-2 { color: var(--color-text-2); }
+.text-text-3 { color: var(--color-text-3); }
+.bg-surface { background: var(--color-surface); }
+.bg-surface-elevated { background: var(--color-surface-elevated); }
+.bg-bg { background: var(--color-bg); }
+.border-separator { border-color: var(--color-separator); }

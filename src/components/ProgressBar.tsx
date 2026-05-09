@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 
 interface ProgressBarProps {
-  progress: number; // 0-100
+  progress: number;
   label?: string;
 }
 
@@ -12,20 +12,17 @@ export function ProgressBar({ progress, label }: ProgressBarProps) {
     <div className="w-full">
       {label && (
         <div className="flex items-center justify-between mb-2">
-          <div className="text-sm font-extrabold text-[var(--color-duo-eel)]">{label}</div>
-          <div className="text-xs font-black text-[var(--color-duo-green)]">{Math.round(progress)}%</div>
+          <div className="type-caption font-semibold text-text-2">{label}</div>
+          <div className="type-caption tabular-nums text-text-3">{Math.round(progress)}%</div>
         </div>
       )}
-      <div className="h-4 w-full bg-[var(--color-duo-swan)] rounded-full overflow-hidden relative">
+      <div className="h-1 w-full bg-gray-200 rounded-full overflow-hidden">
         <motion.div
-          className="h-full bg-[var(--color-duo-green)] rounded-full relative"
+          className="h-full bg-system-blue rounded-full"
           initial={{ width: 0 }}
           animate={{ width: `${progress}%` }}
-          transition={{ duration: 0.4, ease: 'easeOut' }}
-        >
-          <div className="absolute inset-0 top-0.5 bg-[var(--color-duo-green-shadow)] rounded-full opacity-0" />
-          <div className="absolute inset-x-0 top-0.5 h-1 bg-white/40 rounded-full mx-1" />
-        </motion.div>
+          transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
+        />
       </div>
     </div>
   );
