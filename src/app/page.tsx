@@ -18,8 +18,9 @@ import { TickerStats } from '@/components/TickerStats.tsx';
 import { RumorMuseum } from '@/components/RumorMuseum.tsx';
 import { ShareCard } from '@/components/ShareCard.tsx';
 import { HistoryDrawer } from '@/components/HistoryDrawer.tsx';
+import { ReportView } from '@/components/ReportView.tsx';
 import { incrementCheckCount } from '@/lib/utils/userLevel.ts';
-import { addHistory, type HistoryRecord } from '@/lib/utils/history.ts';
+import { addHistory, getHistory, type HistoryRecord } from '@/lib/utils/history.ts';
 import { cn } from '@/lib/utils/cn.ts';
 
 type Phase = 'idle' | 'fetching' | 'extracting' | 'verifying' | 'done' | 'error';
@@ -61,6 +62,7 @@ export default function Home() {
   const [samples, setSamples] = useState<SampleMap>({});
   const [showShareCard, setShowShareCard] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [printRecords, setPrintRecords] = useState<HistoryRecord[] | null>(null);
   const levelIncremented = useRef(false);
   const historySaved = useRef(false);
   const currentSourceRef = useRef<'link' | 'paste' | 'sample'>('paste');
@@ -101,6 +103,44 @@ export default function Home() {
     reset();
     currentSourceRef.current = 'sample';
     runCheck(s.transcript, s.title, s.author);
+  };
+
+  /** 把当前结果转成 HistoryRecord 用于导出（同步使用最新状态） */
+  const buildCurrentRecord = (): HistoryRecord | null => {
+    if (!extraction || verifications.size === 0) return null;
+    const verifMap: Record<string, ClaimCardData> = {};
+    let supported = 0, nei = 0, refuted = 0;
+    verifications.forEach((v, id) => {
+      verifMap[id] = v;
+      if (v.verdict === 'SUPPORTED') supported += 1;
+      else if (v.verdict === 'NEI') nei += 1;
+      else if (v.verdict === 'REFUTED') refuted += 1;
+    });
+    return {
+      id: 'current',
+      timestamp: Date.now(),
+      title: title || '（无标题）',
+      author: author || '未知作者',
+      url: linkUrl || undefined,
+      source: 'paste',
+      summary: extraction.summary,
+      score: computedScore,
+      counts: { SUPPORTED: supported, NEI: nei, REFUTED: refuted },
+      discardedCount: extraction.discarded_segments.length,
+      claims: extraction.claims.map((c) => ({ id: c.id, text: c.text, domain: c.domain, priority: c.priority })),
+      verifications: verifMap,
+      meta: meta ?? undefined,
+    };
+  };
+
+  const exportCurrent = () => {
+    const r = buildCurrentRecord();
+    if (r) setPrintRecords([r]);
+  };
+
+  const exportAllHistory = () => {
+    const all = getHistory();
+    if (all.length > 0) setPrintRecords(all);
   };
 
   /** 从历史记录恢复结果（不重新调 API） */
@@ -670,7 +710,7 @@ export default function Home() {
                   )}
                 </div>
                 {phase === 'done' && (
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <AppleButton
                       variant="primary"
                       size="sm"
@@ -678,7 +718,10 @@ export default function Home() {
                     >
                       📤 转给家人
                     </AppleButton>
-                    <AppleButton variant="secondary" size="sm" onClick={reset}>
+                    <AppleButton variant="secondary" size="sm" onClick={exportCurrent}>
+                      📄 导出 PDF
+                    </AppleButton>
+                    <AppleButton variant="ghost" size="sm" onClick={reset}>
                       再核一条
                     </AppleButton>
                   </div>
@@ -810,7 +853,12 @@ export default function Home() {
         open={showHistory}
         onClose={() => setShowHistory(false)}
         onSelect={restoreFromHistory}
+        onExportSingle={(r) => setPrintRecords([r])}
+        onExportAll={exportAllHistory}
       />
+
+      {/* === 报告打印视图（隐藏，触发 print 时显示） === */}
+      <ReportView records={printRecords} onClose={() => setPrintRecords(null)} />
 
       {/* === 转发分享卡片 modal === */}
       {showShareCard && extraction && (

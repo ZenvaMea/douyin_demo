@@ -259,3 +259,173 @@ textarea.duo-input {
 .bg-duo { background: var(--color-duo); }
 .bg-bg-soft { background: var(--color-bg-soft); }
 .border-separator { border-color: var(--color-separator); }
+
+/* ===========================================
+ * 报告打印样式（用于 PDF 导出）
+ * =========================================== */
+
+/* 屏幕展示时报告默认隐藏 */
+.report-print-root { display: none; }
+
+/* 屏幕版可视化时（debug） */
+.report-debug .report-print-root { display: block; padding: 24px; background: #f5f5f5; }
+.report-debug .report-page { background: white; max-width: 794px; margin: 0 auto 24px; padding: 40px; }
+
+@media print {
+  /* 打印时隐藏其他全部 UI */
+  body > *:not(.report-print-portal),
+  body > *:not(.report-print-portal) * {
+    visibility: hidden !important;
+  }
+  /* 显示报告 */
+  .report-print-root,
+  .report-print-root * {
+    visibility: visible !important;
+  }
+  .report-print-root {
+    display: block !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    background: white;
+    color: #1a1a1a;
+  }
+
+  /* 取消所有动画 */
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+
+  /* 页面设置 */
+  @page {
+    size: A4;
+    margin: 18mm 16mm;
+  }
+
+  .report-page {
+    page-break-after: always;
+    page-break-inside: avoid;
+    padding: 0;
+    background: white;
+  }
+  .report-page:last-child { page-break-after: auto; }
+
+  /* 头部 */
+  .report-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 2px solid #1a1a1a;
+    padding-bottom: 12px;
+    margin-bottom: 18px;
+  }
+  .report-brand { display: flex; align-items: center; gap: 10px; }
+  .report-logo { font-size: 28px; }
+  .report-brand h1 { font-size: 20px; font-weight: 900; margin: 0; }
+  .report-brand-sub { font-size: 11px; color: #666; margin-top: 2px; }
+  .report-page-num { font-size: 11px; color: #666; font-weight: 700; }
+
+  /* 区块 */
+  .report-section { margin-bottom: 18px; page-break-inside: avoid; }
+  .report-h2 {
+    font-size: 14px;
+    font-weight: 800;
+    margin: 0 0 10px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #ddd;
+  }
+
+  /* 视频信息 */
+  .report-meta-grid { font-size: 12px; }
+  .report-meta-row { display: flex; gap: 12px; padding: 4px 0; border-bottom: 1px dashed #eee; }
+  .report-meta-row:last-child { border-bottom: 0; }
+  .report-meta-key { width: 70px; color: #888; font-weight: 700; flex-shrink: 0; }
+  .report-meta-val { flex: 1; color: #1a1a1a; font-weight: 600; word-break: break-all; }
+  .report-meta-url { font-size: 10px; color: #4a6cf7; }
+
+  /* 评分块 */
+  .report-score-block { display: grid; grid-template-columns: auto auto 1fr; gap: 16px; align-items: end; margin-bottom: 12px; }
+  .report-score-num { font-size: 56px; font-weight: 900; line-height: 1; }
+  .report-score-meta { padding-bottom: 6px; }
+  .report-score-of { font-size: 11px; color: #888; font-weight: 700; }
+  .report-score-label { font-size: 13px; font-weight: 800; margin-top: 4px; }
+  .report-counts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .report-count-item { padding: 6px 8px; border-radius: 6px; border: 1px solid; text-align: center; }
+  .report-count-num { font-size: 14px; font-weight: 900; }
+  .report-count-label { font-size: 9px; color: #666; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+
+  .report-summary {
+    font-size: 12px;
+    font-weight: 700;
+    color: #333;
+    margin: 8px 0 4px;
+    padding: 8px 10px;
+    background: #f7f7f7;
+    border-radius: 4px;
+  }
+  .report-discarded {
+    font-size: 11px;
+    color: #888;
+    font-weight: 600;
+    margin: 6px 0 0;
+  }
+
+  /* 声明卡 */
+  .report-claim {
+    background: #fafafa;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    border-radius: 4px;
+    page-break-inside: avoid;
+  }
+  .report-claim-head { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; flex-wrap: wrap; }
+  .report-claim-badge { font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 4px; }
+  .report-claim-id { font-size: 10px; color: #888; font-weight: 700; }
+  .report-claim-conf { font-size: 10px; color: #888; font-weight: 600; }
+  .report-claim-text {
+    font-size: 13px;
+    font-weight: 800;
+    color: #1a1a1a;
+    margin: 0 0 6px;
+    line-height: 1.4;
+  }
+  .report-claim-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 5px;
+    font-size: 11px;
+    line-height: 1.55;
+  }
+  .report-claim-key {
+    width: 36px;
+    color: #888;
+    font-weight: 800;
+    flex-shrink: 0;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding-top: 1px;
+  }
+  .report-claim-val { flex: 1; color: #333; font-weight: 600; }
+  .report-evidence { margin-bottom: 3px; }
+  .report-evidence:last-child { margin-bottom: 0; }
+  .report-claim-truth { background: #f0fae3; padding: 6px 8px; border-radius: 4px; margin-top: 6px; }
+  .report-claim-caveats { margin: 0; padding-left: 14px; }
+  .report-claim-caveats li { margin-bottom: 2px; }
+
+  /* 尾部 */
+  .report-footer {
+    margin-top: 24px;
+    padding-top: 10px;
+    border-top: 1px solid #ddd;
+    text-align: center;
+    font-size: 10px;
+    color: #888;
+    font-weight: 600;
+    line-height: 1.6;
+  }
+}
