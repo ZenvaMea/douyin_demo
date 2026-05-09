@@ -196,13 +196,20 @@ export function HistoryDrawer({ open, onClose, onSelect, onExportSingle, onExpor
                           ? 'var(--color-nei-text)'
                           : 'var(--color-refuted-text)';
                     return (
-                      <motion.button
+                      <motion.div
                         key={r.id}
-                        type="button"
+                        role="button"
+                        tabIndex={0}
                         onClick={() => onSelect(r)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            onSelect(r);
+                          }
+                        }}
                         whileHover={{ y: -2 }}
                         whileTap={{ scale: 0.98 }}
-                        className="duo-card text-left p-4 w-full hover:border-[var(--color-duo)] transition-all relative group"
+                        className="duo-card text-left p-4 w-full hover:border-[var(--color-duo)] transition-all relative group cursor-pointer focus:outline-none focus:border-[var(--color-duo)]"
                         style={{ borderLeftColor: accent, borderLeftWidth: 4 }}
                       >
                         {/* 顶部：时间 + 来源 + 删除 */}
@@ -289,7 +296,7 @@ export function HistoryDrawer({ open, onClose, onSelect, onExportSingle, onExpor
                             </span>
                           </div>
                         </div>
-                      </motion.button>
+                      </motion.div>
                     );
                   })}
                 </div>
