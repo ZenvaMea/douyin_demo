@@ -13,6 +13,8 @@ const MAX_RECORDS = 50;
 interface ExtractedClaimMin {
   id: string;
   text: string;
+  /** 原文中对应的引用片段（用于原文标注） */
+  original_quote: string;
   domain: string;
   priority: 'high' | 'medium' | 'low';
 }
@@ -26,6 +28,8 @@ export interface HistoryRecord {
   url?: string;
   /** 来源：链接 / 粘贴 / 内置样例 */
   source: 'link' | 'paste' | 'sample';
+  /** 视频原文文案（用于原文标注 / 回看） */
+  transcript: string;
   /** 总结 */
   summary: string;
   /** 可信度评分 0-100 */

@@ -20,6 +20,7 @@ import { ShareCard } from '@/components/ShareCard.tsx';
 import { HistoryDrawer } from '@/components/HistoryDrawer.tsx';
 import { ReportView } from '@/components/ReportView.tsx';
 import { Toast } from '@/components/Toast.tsx';
+import { AnnotatedTranscript } from '@/components/AnnotatedTranscript.tsx';
 import { incrementCheckCount } from '@/lib/utils/userLevel.ts';
 import { addHistory, getHistory, type HistoryRecord } from '@/lib/utils/history.ts';
 import { cn } from '@/lib/utils/cn.ts';
@@ -125,11 +126,12 @@ export default function Home() {
       author: author || '未知作者',
       url: linkUrl || undefined,
       source: 'paste',
+      transcript,
       summary: extraction.summary,
       score: computedScore,
       counts: { SUPPORTED: supported, NEI: nei, REFUTED: refuted },
       discardedCount: extraction.discarded_segments.length,
-      claims: extraction.claims.map((c) => ({ id: c.id, text: c.text, domain: c.domain, priority: c.priority })),
+      claims: extraction.claims.map((c) => ({ id: c.id, text: c.text, original_quote: c.original_quote, domain: c.domain, priority: c.priority })),
       verifications: verifMap,
       meta: meta ?? undefined,
     };
@@ -170,6 +172,7 @@ export default function Home() {
     reset();
     setTitle(record.title);
     setAuthor(record.author);
+    setTranscript(record.transcript ?? '');
     setMeta(record.meta ?? null);
     // 恢复 extraction
     setExtraction({
@@ -178,7 +181,7 @@ export default function Home() {
       claims: record.claims.map((c) => ({
         id: c.id,
         text: c.text,
-        original_quote: '',
+        original_quote: c.original_quote ?? '',
         domain: c.domain,
         priority: c.priority,
         search_keywords: [],
@@ -347,6 +350,7 @@ export default function Home() {
                         author: au || '未知作者',
                         url: currentSourceRef.current === 'link' ? linkUrl : undefined,
                         source: currentSourceRef.current,
+                        transcript: t,
                         summary: extCurrent.summary,
                         score,
                         counts: { SUPPORTED: supported, NEI: nei, REFUTED: refuted },
@@ -354,6 +358,7 @@ export default function Home() {
                         claims: extCurrent.claims.map((c) => ({
                           id: c.id,
                           text: c.text,
+                          original_quote: c.original_quote,
                           domain: c.domain,
                           priority: c.priority,
                         })),
@@ -811,12 +816,23 @@ export default function Home() {
               </motion.div>
             )}
 
-            {/* 声明列表 */}
+            {/* 🌟 原文标注（核心新功能 - 一眼看出哪里有问题）*/}
+            {extraction && transcript && verifications.size > 0 && (
+              <div className="mb-6">
+                <AnnotatedTranscript
+                  transcript={transcript}
+                  claims={extraction.claims}
+                  verifications={verifications}
+                />
+              </div>
+            )}
+
+            {/* 详细核查列表 */}
             {extraction && (
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <div className="text-[15px] font-extrabold text-text flex items-center gap-1.5">
-                    <span>🔍</span> 真假核查
+                    <span>🔍</span> 详细核查报告
                   </div>
                   <div className="text-[11px] font-extrabold text-text-3 uppercase tracking-wider">
                     点击展开 ↓
