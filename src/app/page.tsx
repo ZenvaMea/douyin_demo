@@ -897,16 +897,29 @@ export default function Home() {
         <ShareCard
           title={title || '抖音视频'}
           author={author || '未知作者'}
+          summary={extraction.summary}
           score={computedScore}
           counts={counts}
-          topClaim={(() => {
-            // 优先选 REFUTED，其次 NEI
-            const refuted = Array.from(verifications.values()).find((v) => v.verdict === 'REFUTED');
-            if (refuted) return { claim_text: refuted.claim_text, verdict: refuted.verdict, truth_rewrite: refuted.truth_rewrite };
-            const nei = Array.from(verifications.values()).find((v) => v.verdict === 'NEI');
-            if (nei) return { claim_text: nei.claim_text, verdict: nei.verdict, truth_rewrite: nei.truth_rewrite };
-            const first = Array.from(verifications.values())[0];
-            return first ? { claim_text: first.claim_text, verdict: first.verdict, truth_rewrite: first.truth_rewrite } : undefined;
+          discardedCount={extraction.discarded_segments.length}
+          topClaims={(() => {
+            // 优先 REFUTED，再 NEI，凑最多 3 条
+            const refs = Array.from(verifications.values()).filter((v) => v.verdict === 'REFUTED');
+            const neis = Array.from(verifications.values()).filter((v) => v.verdict === 'NEI');
+            const picked = [...refs, ...neis].slice(0, 3);
+            return picked.map((v) => ({
+              claim_text: v.claim_text,
+              verdict: v.verdict,
+              truth_rewrite: v.truth_rewrite,
+              source_name: v.evidence[0]?.source_name,
+            }));
+          })()}
+          sources={(() => {
+            // 收集所有不重复的引用源
+            const set = new Set<string>();
+            verifications.forEach((v) => {
+              v.evidence.forEach((e) => set.add(e.source_name));
+            });
+            return Array.from(set).slice(0, 5);
           })()}
           onClose={() => setShowShareCard(false)}
         />

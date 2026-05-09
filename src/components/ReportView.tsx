@@ -3,9 +3,13 @@
 /**
  * 核查报告 - 杂志风简约设计
  * 配合 globals.css @media print 输出 PDF
+ *
+ * 关键：用 React Portal 渲染到 document.body 直接子节点
+ * 避免被父容器的 visibility: hidden 影响
  */
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import type { HistoryRecord } from '@/lib/utils/history.ts';
 
 const VERDICT_META = {
@@ -33,8 +37,15 @@ interface ReportViewProps {
 }
 
 export function ReportView({ records, onClose }: ReportViewProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   useEffect(() => {
     if (!records || records.length === 0) return;
+    if (!mounted) return;
     const timer = setTimeout(() => {
       window.print();
       const onAfterPrint = () => {
@@ -42,11 +53,12 @@ export function ReportView({ records, onClose }: ReportViewProps) {
         window.removeEventListener('afterprint', onAfterPrint);
       };
       window.addEventListener('afterprint', onAfterPrint);
-    }, 200);
+    }, 250);
     return () => clearTimeout(timer);
-  }, [records, onClose]);
+  }, [records, onClose, mounted]);
 
   if (!records || records.length === 0) return null;
+  if (!mounted) return null;
 
   const formatDate = (ts: number) => {
     const d = new Date(ts);
@@ -54,7 +66,7 @@ export function ReportView({ records, onClose }: ReportViewProps) {
     return `${d.getFullYear()}.${pad(d.getMonth() + 1)}.${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
   };
 
-  return (
+  return createPortal(
     <div className="report-print-root">
       {records.map((r, idx) => {
         const verdict =
@@ -227,6 +239,7 @@ export function ReportView({ records, onClose }: ReportViewProps) {
           </article>
         );
       })}
-    </div>
+    </div>,
+    document.body,
   );
 }
