@@ -84,6 +84,55 @@ export default function Home() {
     return () => window.removeEventListener('factbuddy:open-history', onOpen);
   }, []);
 
+  // 核查完成后：等级 +1 + 保存到历史记录
+  // 用 useEffect 避免在 render / setState 期间触发其他组件的 setState
+  useEffect(() => {
+    if (phase !== 'done') return;
+    if (!extraction || verifications.size === 0) return;
+
+    if (!levelIncremented.current) {
+      levelIncremented.current = true;
+      incrementCheckCount();
+    }
+
+    if (!historySaved.current) {
+      historySaved.current = true;
+      const verifMap: Record<string, ClaimCardData> = {};
+      let supported = 0, nei = 0, refuted = 0;
+      verifications.forEach((v, id) => {
+        verifMap[id] = v;
+        if (v.verdict === 'SUPPORTED') supported += 1;
+        else if (v.verdict === 'NEI') nei += 1;
+        else if (v.verdict === 'REFUTED') refuted += 1;
+      });
+      const total = verifications.size;
+      const score = total > 0 ? Math.round(((supported + nei * 0.5) / total) * 100) : 0;
+
+      addHistory({
+        title: title || '（无标题）',
+        author: author || '未知作者',
+        url: currentSourceRef.current === 'link' ? linkUrl : undefined,
+        source: currentSourceRef.current,
+        transcript,
+        summary: extraction.summary,
+        score,
+        counts: { SUPPORTED: supported, NEI: nei, REFUTED: refuted },
+        discardedCount: extraction.discarded_segments.length,
+        claims: extraction.claims.map((c) => ({
+          id: c.id,
+          text: c.text,
+          original_quote: c.original_quote,
+          domain: c.domain,
+          priority: c.priority,
+        })),
+        verifications: verifMap,
+        meta: meta ?? undefined,
+      });
+    }
+    // 仅在 phase 变为 done 时触发；其他依赖通过 closure 取最新值无需追踪
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase]);
+
   const reset = () => {
     abortRef.current?.abort();
     setPhase('idle');
@@ -318,60 +367,7 @@ export default function Home() {
             }
           } else if (eventName === 'done') {
             setPhase('done');
-            // 防骗等级 +1（每次核查只算一次）
-            if (!levelIncremented.current) {
-              incrementCheckCount();
-              levelIncremented.current = true;
-            }
-            // 保存到历史记录
-            if (!historySaved.current) {
-              historySaved.current = true;
-              // 用 setTimeout 等 verifications 状态完全更新
-              setTimeout(() => {
-                setVerifications((current) => {
-                  const verifMap: Record<string, ClaimCardData> = {};
-                  let supported = 0,
-                    nei = 0,
-                    refuted = 0;
-                  current.forEach((v, id) => {
-                    verifMap[id] = v;
-                    if (v.verdict === 'SUPPORTED') supported += 1;
-                    else if (v.verdict === 'NEI') nei += 1;
-                    else if (v.verdict === 'REFUTED') refuted += 1;
-                  });
-                  const total = current.size;
-                  const score = total > 0
-                    ? Math.round(((supported + nei * 0.5) / total) * 100)
-                    : 0;
-                  setExtraction((extCurrent) => {
-                    if (extCurrent && current.size > 0) {
-                      addHistory({
-                        title: ti || '（无标题）',
-                        author: au || '未知作者',
-                        url: currentSourceRef.current === 'link' ? linkUrl : undefined,
-                        source: currentSourceRef.current,
-                        transcript: t,
-                        summary: extCurrent.summary,
-                        score,
-                        counts: { SUPPORTED: supported, NEI: nei, REFUTED: refuted },
-                        discardedCount: extCurrent.discarded_segments.length,
-                        claims: extCurrent.claims.map((c) => ({
-                          id: c.id,
-                          text: c.text,
-                          original_quote: c.original_quote,
-                          domain: c.domain,
-                          priority: c.priority,
-                        })),
-                        verifications: verifMap,
-                        meta: meta ?? undefined,
-                      });
-                    }
-                    return extCurrent;
-                  });
-                  return current;
-                });
-              }, 100);
-            }
+            // 注意：保存历史 + 等级 +1 在 useEffect 里做（避免 render 期间 setState）
           } else if (eventName === 'error') {
             const e = data as { message: string };
             setErrorMsg(e.message);
