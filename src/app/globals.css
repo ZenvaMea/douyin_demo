@@ -1,0 +1,203 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+/**
+ * 打假搭子 · 多邻国风格主题
+ * 参考 Duolingo 官方品牌色板
+ */
+@theme {
+  /* === 主色（Duolingo Owl Green） === */
+  --color-duo-green: #58cc02;
+  --color-duo-green-hover: #61e002;
+  --color-duo-green-shadow: #58a700;
+  --color-duo-green-light: #d7ffb8;
+  --color-duo-green-bg: #f7ffeb;
+
+  /* === 辅色 === */
+  --color-duo-blue: #1cb0f6;
+  --color-duo-blue-shadow: #1899d6;
+  --color-duo-blue-light: #ddf4ff;
+
+  --color-duo-yellow: #ffc800;
+  --color-duo-yellow-shadow: #e6b400;
+  --color-duo-yellow-light: #fff9d6;
+
+  --color-duo-red: #ff4b4b;
+  --color-duo-red-shadow: #ea2b2b;
+  --color-duo-red-light: #ffdfe0;
+
+  --color-duo-purple: #ce82ff;
+  --color-duo-purple-shadow: #b15adb;
+  --color-duo-purple-light: #f3e3ff;
+
+  /* === 中性色 === */
+  --color-duo-eel: #4b4b4b;
+  --color-duo-wolf: #777777;
+  --color-duo-hare: #afafaf;
+  --color-duo-swan: #e5e5e5;
+  --color-duo-snow: #f7f7f7;
+  --color-duo-feather: #e5e5e5;
+
+  /* === 字体 === */
+  --font-display: "Nunito", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --font-body: "Nunito", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body {
+  background: #ffffff;
+  color: #4b4b4b;
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* === 多邻国 3D 按钮基础类 === */
+.duo-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: 16px;
+  padding: 14px 24px;
+  cursor: pointer;
+  transition: filter 0.15s, transform 0.05s;
+  user-select: none;
+  border: none;
+  position: relative;
+  font-family: var(--font-display);
+}
+
+.duo-btn:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 0 0 currentColor !important;
+}
+
+.duo-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 主按钮（绿色） */
+.duo-btn-primary {
+  background: var(--color-duo-green);
+  color: white;
+  box-shadow: 0 4px 0 var(--color-duo-green-shadow);
+}
+.duo-btn-primary:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+/* 次按钮（蓝色） */
+.duo-btn-secondary {
+  background: var(--color-duo-blue);
+  color: white;
+  box-shadow: 0 4px 0 var(--color-duo-blue-shadow);
+}
+.duo-btn-secondary:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+/* 幽灵按钮（白底） */
+.duo-btn-ghost {
+  background: white;
+  color: var(--color-duo-eel);
+  box-shadow: 0 2px 0 var(--color-duo-swan);
+  border: 2px solid var(--color-duo-swan);
+}
+.duo-btn-ghost:hover:not(:disabled) {
+  background: var(--color-duo-snow);
+}
+
+/* === 多邻国卡片 === */
+.duo-card {
+  background: white;
+  border: 2px solid var(--color-duo-swan);
+  border-radius: 20px;
+  padding: 20px;
+  transition: border-color 0.2s;
+}
+
+.duo-card-green { border-color: var(--color-duo-green); background: var(--color-duo-green-bg); }
+.duo-card-yellow { border-color: var(--color-duo-yellow); background: var(--color-duo-yellow-light); }
+.duo-card-red { border-color: var(--color-duo-red); background: var(--color-duo-red-light); }
+.duo-card-blue { border-color: var(--color-duo-blue); background: var(--color-duo-blue-light); }
+
+/* === 多邻国进度环（用于可信度评分） === */
+.duo-progress-track {
+  stroke: var(--color-duo-swan);
+}
+.duo-progress-bar-green { stroke: var(--color-duo-green); }
+.duo-progress-bar-yellow { stroke: var(--color-duo-yellow); }
+.duo-progress-bar-red { stroke: var(--color-duo-red); }
+
+/* === 文本输入框 === */
+.duo-input {
+  width: 100%;
+  border: 2px solid var(--color-duo-swan);
+  border-radius: 16px;
+  padding: 16px 20px;
+  background: white;
+  color: var(--color-duo-eel);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  resize: none;
+}
+.duo-input:focus {
+  border-color: var(--color-duo-blue);
+  box-shadow: 0 0 0 4px var(--color-duo-blue-light);
+}
+
+/* === 标签徽章 === */
+.duo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+
+.duo-badge-green { background: var(--color-duo-green); color: white; }
+.duo-badge-yellow { background: var(--color-duo-yellow); color: white; }
+.duo-badge-red { background: var(--color-duo-red); color: white; }
+.duo-badge-blue { background: var(--color-duo-blue); color: white; }
+.duo-badge-gray { background: var(--color-duo-hare); color: white; }
+
+/* === 滚动条 === */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--color-duo-swan);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--color-duo-hare); }
+
+/* 回弹动画 */
+@keyframes pop-in {
+  0% { transform: scale(0.95); opacity: 0; }
+  60% { transform: scale(1.02); opacity: 1; }
+  100% { transform: scale(1); }
+}
+.animate-pop-in { animation: pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up { animation: fade-up 0.3s ease-out both; }
