@@ -15,6 +15,9 @@ import { ValueProps } from '@/components/ValueProps.tsx';
 import { PainPoints } from '@/components/PainPoints.tsx';
 import { MythQuiz } from '@/components/MythQuiz.tsx';
 import { TickerStats } from '@/components/TickerStats.tsx';
+import { RumorMuseum } from '@/components/RumorMuseum.tsx';
+import { ShareCard } from '@/components/ShareCard.tsx';
+import { incrementCheckCount } from '@/lib/utils/userLevel.ts';
 import { cn } from '@/lib/utils/cn.ts';
 
 type Phase = 'idle' | 'fetching' | 'extracting' | 'verifying' | 'done' | 'error';
@@ -54,6 +57,8 @@ export default function Home() {
   const [progress, setProgress] = useState({ done: 0, total: 0 });
   const [errorMsg, setErrorMsg] = useState('');
   const [samples, setSamples] = useState<SampleMap>({});
+  const [showShareCard, setShowShareCard] = useState(false);
+  const levelIncremented = useRef(false);
 
   const abortRef = useRef<AbortController | null>(null);
   const resultRef = useRef<HTMLDivElement | null>(null);
@@ -71,6 +76,8 @@ export default function Home() {
     setProgress({ done: 0, total: 0 });
     setPhaseLabel('');
     setErrorMsg('');
+    setShowShareCard(false);
+    levelIncremented.current = false;
   };
 
   const useSample = (s: SampleData) => {
@@ -193,6 +200,11 @@ export default function Home() {
             }
           } else if (eventName === 'done') {
             setPhase('done');
+            // 防骗等级 +1（每次核查只算一次）
+            if (!levelIncremented.current) {
+              incrementCheckCount();
+              levelIncremented.current = true;
+            }
           } else if (eventName === 'error') {
             const e = data as { message: string };
             setErrorMsg(e.message);
@@ -454,6 +466,11 @@ export default function Home() {
               <ValueProps />
             </section>
 
+            {/* === 谣言博物馆 === */}
+            <section className="mb-14">
+              <RumorMuseum />
+            </section>
+
             {/* === 二次 CTA === */}
             <motion.div
               initial={{ opacity: 0, y: 12 }}
@@ -552,9 +569,18 @@ export default function Home() {
                   )}
                 </div>
                 {phase === 'done' && (
-                  <AppleButton variant="secondary" size="sm" onClick={reset}>
-                    再核一条
-                  </AppleButton>
+                  <div className="flex items-center gap-2">
+                    <AppleButton
+                      variant="primary"
+                      size="sm"
+                      onClick={() => setShowShareCard(true)}
+                    >
+                      📤 转给家人
+                    </AppleButton>
+                    <AppleButton variant="secondary" size="sm" onClick={reset}>
+                      再核一条
+                    </AppleButton>
+                  </div>
                 )}
               </div>
               {phase === 'verifying' && progress.total > 0 && (
@@ -677,6 +703,26 @@ export default function Home() {
           </section>
         )}
       </main>
+
+      {/* === 转发分享卡片 modal === */}
+      {showShareCard && extraction && (
+        <ShareCard
+          title={title || '抖音视频'}
+          author={author || '未知作者'}
+          score={computedScore}
+          counts={counts}
+          topClaim={(() => {
+            // 优先选 REFUTED，其次 NEI
+            const refuted = Array.from(verifications.values()).find((v) => v.verdict === 'REFUTED');
+            if (refuted) return { claim_text: refuted.claim_text, verdict: refuted.verdict, truth_rewrite: refuted.truth_rewrite };
+            const nei = Array.from(verifications.values()).find((v) => v.verdict === 'NEI');
+            if (nei) return { claim_text: nei.claim_text, verdict: nei.verdict, truth_rewrite: nei.truth_rewrite };
+            const first = Array.from(verifications.values())[0];
+            return first ? { claim_text: first.claim_text, verdict: first.verdict, truth_rewrite: first.truth_rewrite } : undefined;
+          })()}
+          onClose={() => setShowShareCard(false)}
+        />
+      )}
 
       {/* === Footer === */}
       <footer className="py-8 mt-12 border-t-2 border-[var(--color-separator)]">
