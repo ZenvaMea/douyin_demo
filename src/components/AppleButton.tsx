@@ -3,8 +3,8 @@
 import { cn } from '@/lib/utils/cn.ts';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
-interface DarkButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'ghost' | 'tinted';
+interface DuoButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary' | 'ghost';
   size?: 'sm' | 'md' | 'lg' | 'xl';
   icon?: ReactNode;
   iconRight?: ReactNode;
@@ -12,11 +12,10 @@ interface DarkButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 /**
- * 暗色 Linear 风按钮
- * primary: 紫色渐变 + glow
- * secondary: 半透明白底
+ * 多邻国 3D 按钮（柔和版）
+ * primary: 绿色 3D 立体（多邻国标志）
+ * secondary: 白底灰边
  * ghost: 透明
- * tinted: 紫色透明
  */
 export function AppleButton({
   variant = 'primary',
@@ -27,20 +26,19 @@ export function AppleButton({
   className,
   children,
   ...rest
-}: DarkButtonProps) {
+}: DuoButtonProps) {
   return (
     <button
       {...rest}
       className={cn(
-        'btn-base',
-        variant === 'primary' && 'btn-primary',
-        variant === 'secondary' && 'btn-secondary',
-        variant === 'ghost' && 'btn-ghost',
-        variant === 'tinted' && 'btn-tinted',
-        size === 'sm' && 'btn-sm',
-        size === 'md' && 'btn-md',
-        size === 'lg' && 'btn-lg',
-        size === 'xl' && 'btn-xl',
+        'duo-btn',
+        variant === 'primary' && 'duo-btn-primary',
+        variant === 'secondary' && 'duo-btn-secondary',
+        variant === 'ghost' && 'duo-btn-ghost',
+        size === 'sm' && 'duo-btn-sm',
+        size === 'md' && 'duo-btn-md',
+        size === 'lg' && 'duo-btn-lg',
+        size === 'xl' && 'duo-btn-xl',
         fullWidth && 'w-full',
         className,
       )}

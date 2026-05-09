@@ -27,58 +27,39 @@ export interface ClaimCardData {
 
 const VERDICT_META: Record<Verdict, {
   label: string;
-  bar: string;
-  bg: string;
-  textColor: string;
-  glow: string;
-  icon: React.ReactNode;
+  emoji: string;
+  bgVar: string;
+  textVar: string;
+  barVar: string;
 }> = {
   SUPPORTED: {
     label: '已验证',
-    bar: '#3FCF8E',
-    bg: 'rgba(63, 207, 142, 0.06)',
-    textColor: '#5BE9A9',
-    glow: 'rgba(63, 207, 142, 0.15)',
-    icon: (
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.2" />
-        <path d="M8 12.5l3 3 5-6" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    ),
+    emoji: '✅',
+    bgVar: 'var(--color-supported-bg)',
+    textVar: 'var(--color-supported-text)',
+    barVar: 'var(--color-supported)',
   },
   NEI: {
     label: '存疑',
-    bar: '#FFB224',
-    bg: 'rgba(255, 178, 36, 0.06)',
-    textColor: '#FFC85C',
-    glow: 'rgba(255, 178, 36, 0.15)',
-    icon: (
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.2" />
-        <path d="M9 9.5a3 3 0 116 0c0 1.5-1.5 2-2.5 3-.5.5-.5 1-.5 1.5M12 17.5h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    ),
+    emoji: '🤔',
+    bgVar: 'var(--color-nei-bg)',
+    textVar: 'var(--color-nei-text)',
+    barVar: 'var(--color-nei)',
   },
   REFUTED: {
     label: '误导',
-    bar: '#FF5C5C',
-    bg: 'rgba(255, 92, 92, 0.06)',
-    textColor: '#FF8585',
-    glow: 'rgba(255, 92, 92, 0.15)',
-    icon: (
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.2" />
-        <path d="M9 9l6 6M15 9l-6 6" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
-      </svg>
-    ),
+    emoji: '❌',
+    bgVar: 'var(--color-refuted-bg)',
+    textVar: 'var(--color-refuted-text)',
+    barVar: 'var(--color-refuted)',
   },
 };
 
-const RELATION_META: Record<Evidence['claim_relation'], { label: string; color: string }> = {
-  supports: { label: '支持', color: 'text-[#5BE9A9]' },
-  refutes: { label: '反驳', color: 'text-[#FF8585]' },
-  partially_supports: { label: '部分支持', color: 'text-[#FFC85C]' },
-  context_dependent: { label: '视情况', color: 'text-text-3' },
+const RELATION_META: Record<Evidence['claim_relation'], { label: string; emoji: string }> = {
+  supports: { label: '支持', emoji: '👍' },
+  refutes: { label: '反驳', emoji: '👎' },
+  partially_supports: { label: '部分支持', emoji: '🤷' },
+  context_dependent: { label: '视情况', emoji: '🔄' },
 };
 
 export function ClaimCard({ data, index }: { data: ClaimCardData; index: number }) {
@@ -90,19 +71,12 @@ export function ClaimCard({ data, index }: { data: ClaimCardData; index: number 
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05, type: 'spring', stiffness: 380, damping: 32 }}
-      className="relative rounded-[14px] overflow-hidden"
-      style={{
-        background: `linear-gradient(135deg, ${meta.bg} 0%, rgba(255,255,255,0.03) 100%)`,
-        boxShadow: `inset 0 0 0 1px rgba(255,255,255,0.06), 0 0 0 1px ${meta.bg}`,
-      }}
+      className="relative rounded-[16px] overflow-hidden border-2 border-[var(--color-border)] bg-white"
     >
       {/* 左侧 indicator */}
       <div
-        className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full"
-        style={{
-          background: meta.bar,
-          boxShadow: `0 0 12px ${meta.glow}`,
-        }}
+        className="absolute left-0 top-3 bottom-3 w-[4px] rounded-full"
+        style={{ background: meta.barVar }}
       />
 
       <button
@@ -110,31 +84,33 @@ export function ClaimCard({ data, index }: { data: ClaimCardData; index: number 
         onClick={() => setOpen((v) => !v)}
         className="w-full flex items-start gap-3 text-left pl-5 pr-4 py-4"
       >
+        <span className="text-2xl flex-shrink-0 leading-none mt-0.5">{meta.emoji}</span>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-2 flex-wrap">
+          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
             <span
-              className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.06em]"
-              style={{ color: meta.textColor }}
+              className="px-2 py-0.5 rounded-md text-[11px] font-extrabold uppercase tracking-wider"
+              style={{
+                background: meta.bgVar,
+                color: meta.textVar,
+              }}
             >
-              {meta.icon}
               {meta.label}
             </span>
+            <span className="text-[11px] font-extrabold text-text-3">{data.claim_id}</span>
             <span className="text-text-3">·</span>
-            <span className="text-[11px] text-text-3 font-mono">{data.claim_id}</span>
-            <span className="text-text-3">·</span>
-            <span className="text-[11px] text-text-3">置信度 {data.confidence}/5</span>
+            <span className="text-[11px] font-bold text-text-3">置信 {data.confidence}/5</span>
           </div>
-          <p className="text-[15px] font-medium text-text leading-snug">{data.claim_text}</p>
+          <p className="text-[15px] font-bold text-text leading-snug">{data.claim_text}</p>
         </div>
         <div
           className={cn(
-            'mt-1 flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center',
-            'text-text-3 transition-all duration-200',
-            open && 'rotate-180 bg-white/[0.06]',
+            'mt-1.5 flex-shrink-0 w-7 h-7 rounded-full bg-bg-soft flex items-center justify-center',
+            'text-text-3 transition-transform duration-200',
+            open && 'rotate-180',
           )}
         >
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-            <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
       </button>
@@ -146,23 +122,25 @@ export function ClaimCard({ data, index }: { data: ClaimCardData; index: number 
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
+            transition={{ duration: 0.25 }}
             className="overflow-hidden"
           >
-            <div className="pt-4 mx-5 mb-5 border-t border-white/[0.06] space-y-5 pt-5">
+            <div className="px-5 pb-5 pt-4 mt-1 border-t-2 border-dashed border-[var(--color-border)] space-y-4">
               {/* 推理 */}
               <div>
-                <div className="text-[10px] font-semibold text-text-3 uppercase tracking-[0.12em] mb-2">
-                  推理过程
+                <div className="text-[10px] font-extrabold text-text-3 uppercase tracking-[0.12em] mb-1.5 flex items-center gap-1.5">
+                  <span>🧠</span> 推理过程
                 </div>
-                <p className="text-[14px] text-text-2 leading-relaxed">{data.reasoning}</p>
+                <p className="text-[14px] font-semibold text-text-2 leading-relaxed">
+                  {data.reasoning}
+                </p>
               </div>
 
               {/* 证据 */}
               {data.evidence.length > 0 && (
                 <div>
-                  <div className="text-[10px] font-semibold text-text-3 uppercase tracking-[0.12em] mb-2">
-                    引用证据
+                  <div className="text-[10px] font-extrabold text-text-3 uppercase tracking-[0.12em] mb-2 flex items-center gap-1.5">
+                    <span>📚</span> 引用证据
                   </div>
                   <div className="space-y-2">
                     {data.evidence.map((e, i) => {
@@ -170,19 +148,22 @@ export function ClaimCard({ data, index }: { data: ClaimCardData; index: number 
                       return (
                         <div
                           key={i}
-                          className="rounded-[10px] p-3 bg-white/[0.03] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]"
+                          className="rounded-[12px] p-3 bg-bg-soft border-2 border-[var(--color-separator)]"
                         >
                           <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                            <span className={cn('text-[11px] font-semibold', r.color)}>
-                              {r.label}
+                            <span className="text-[12px] font-extrabold text-text-2">
+                              {r.emoji} {r.label}
                             </span>
-                            <span className="text-text-3">·</span>
-                            <span className="text-[13px] font-semibold text-text">{e.source_name}</span>
-                            <span className="text-[10px] text-text-3 uppercase tracking-[0.08em]">
+                            <span className="text-[13px] font-extrabold text-duo">
+                              {e.source_name}
+                            </span>
+                            <span className="text-[10px] font-bold text-text-3 uppercase tracking-wider">
                               {e.source_type}
                             </span>
                           </div>
-                          <p className="text-[13px] text-text-2 leading-relaxed">{e.summary}</p>
+                          <p className="text-[13px] font-semibold text-text-2 leading-relaxed">
+                            {e.summary}
+                          </p>
                         </div>
                       );
                     })}
@@ -190,32 +171,33 @@ export function ClaimCard({ data, index }: { data: ClaimCardData; index: number 
                 </div>
               )}
 
-              {/* 真相重写 */}
+              {/* 真相版本 */}
               <div
-                className="rounded-[10px] p-4 relative overflow-hidden"
+                className="rounded-[12px] p-4 border-2"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(63,207,142,0.08) 0%, rgba(255,255,255,0.02) 100%)',
-                  boxShadow: 'inset 0 0 0 1px rgba(63,207,142,0.2)',
+                  background: 'var(--color-supported-bg)',
+                  borderColor: 'var(--color-supported)',
                 }}
               >
-                <div className="text-[10px] font-semibold text-[#5BE9A9] uppercase tracking-[0.12em] mb-2 flex items-center gap-1.5">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
-                    <path d="M5 12.5l5 5 9-11" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  真相版本
+                <div className="text-[10px] font-extrabold uppercase tracking-[0.12em] mb-1.5 flex items-center gap-1.5"
+                  style={{ color: 'var(--color-supported-text)' }}
+                >
+                  <span>✏️</span> 真相版本
                 </div>
-                <p className="text-[14px] text-text leading-relaxed">{data.truth_rewrite}</p>
+                <p className="text-[14px] font-bold text-text leading-relaxed">
+                  {data.truth_rewrite}
+                </p>
               </div>
 
               {/* 注意事项 */}
               {data.caveats.length > 0 && (
                 <div>
-                  <div className="text-[10px] font-semibold text-text-3 uppercase tracking-[0.12em] mb-2">
-                    需注意
+                  <div className="text-[10px] font-extrabold text-text-3 uppercase tracking-[0.12em] mb-1.5 flex items-center gap-1.5">
+                    <span>⚠️</span> 需注意
                   </div>
-                  <ul className="space-y-1.5">
+                  <ul className="space-y-1">
                     {data.caveats.map((c, i) => (
-                      <li key={i} className="text-[13px] text-text-2 flex gap-2 leading-relaxed">
+                      <li key={i} className="text-[13px] font-semibold text-text-2 flex gap-2 leading-relaxed">
                         <span className="text-text-3 flex-shrink-0">•</span>
                         <span>{c}</span>
                       </li>
@@ -225,12 +207,8 @@ export function ClaimCard({ data, index }: { data: ClaimCardData; index: number 
               )}
 
               {data.needs_web_search && (
-                <div className="text-[11px] text-text-3 flex items-center gap-1.5">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
-                    <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
-                    <path d="M16 16l4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                  </svg>
-                  建议进一步联网检索
+                <div className="text-[11px] font-bold text-text-3 flex items-center gap-1.5">
+                  <span>🔍</span> 建议进一步联网检索
                 </div>
               )}
             </div>
