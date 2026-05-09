@@ -21,6 +21,7 @@ import { HistoryDrawer } from '@/components/HistoryDrawer.tsx';
 import { ReportView } from '@/components/ReportView.tsx';
 import { Toast } from '@/components/Toast.tsx';
 import { AnnotatedTranscript } from '@/components/AnnotatedTranscript.tsx';
+import { AuthoritativeSources } from '@/components/AuthoritativeSources.tsx';
 import { incrementCheckCount } from '@/lib/utils/userLevel.ts';
 import { addHistory, getHistory, type HistoryRecord } from '@/lib/utils/history.ts';
 import { cn } from '@/lib/utils/cn.ts';
@@ -871,6 +872,16 @@ export default function Home() {
                     })}
                   </AnimatePresence>
                 </div>
+              </div>
+            )}
+
+            {/* 🌟 抖音精选权威源推荐 - 闭环：错误内容 → 正规对照 */}
+            {phase === 'done' && extraction && verifications.size > 0 && (
+              <div className="mt-6">
+                <AuthoritativeSources
+                  primaryDomain={extraction.primary_domain}
+                  hasIssue={counts.REFUTED > 0 || counts.NEI > 0}
+                />
               </div>
             )}
           </section>
