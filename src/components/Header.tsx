@@ -4,9 +4,11 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils/cn.ts';
 import { UserLevelBadge } from './UserLevelBadge.tsx';
+import { getHistory } from '@/lib/utils/history.ts';
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
+  const [historyCount, setHistoryCount] = useState(0);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -14,6 +16,20 @@ export function Header() {
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  useEffect(() => {
+    setHistoryCount(getHistory().length);
+    const onUpdate = (e: Event) => {
+      const custom = e as CustomEvent<number>;
+      setHistoryCount(custom.detail);
+    };
+    window.addEventListener('factbuddy:history-update', onUpdate);
+    return () => window.removeEventListener('factbuddy:history-update', onUpdate);
+  }, []);
+
+  const openHistory = () => {
+    window.dispatchEvent(new CustomEvent('factbuddy:open-history'));
+  };
 
   return (
     <header
@@ -35,6 +51,22 @@ export function Header() {
         </Link>
 
         <div className="flex items-center gap-2">
+          {/* === 我的核查记录 === */}
+          <button
+            type="button"
+            onClick={openHistory}
+            className="relative flex items-center gap-1.5 h-9 px-3 rounded-[10px] bg-bg-soft hover:bg-[var(--color-border)] transition-colors text-[12px] font-extrabold text-text-2"
+            aria-label="我的核查记录"
+          >
+            <span className="text-base">📚</span>
+            <span className="hidden sm:inline">记录</span>
+            {historyCount > 0 && (
+              <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-duo text-white text-[10px] font-black">
+                {historyCount > 99 ? '99+' : historyCount}
+              </span>
+            )}
+          </button>
+
           {/* === 防骗等级徽章 === */}
           <UserLevelBadge />
 
@@ -43,7 +75,7 @@ export function Header() {
             href="https://github.com/ZenvaMea/douyin_demo"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden sm:flex items-center gap-2 h-9 px-3 rounded-[10px] bg-bg-soft hover:bg-[var(--color-border)] transition-colors text-[12px] font-bold text-text-2"
+            className="hidden md:flex items-center gap-2 h-9 px-3 rounded-[10px] bg-bg-soft hover:bg-[var(--color-border)] transition-colors text-[12px] font-bold text-text-2"
             aria-label="GitHub"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">

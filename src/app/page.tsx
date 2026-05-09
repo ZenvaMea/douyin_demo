@@ -17,7 +17,9 @@ import { MythQuiz } from '@/components/MythQuiz.tsx';
 import { TickerStats } from '@/components/TickerStats.tsx';
 import { RumorMuseum } from '@/components/RumorMuseum.tsx';
 import { ShareCard } from '@/components/ShareCard.tsx';
+import { HistoryDrawer } from '@/components/HistoryDrawer.tsx';
 import { incrementCheckCount } from '@/lib/utils/userLevel.ts';
+import { addHistory, type HistoryRecord } from '@/lib/utils/history.ts';
 import { cn } from '@/lib/utils/cn.ts';
 
 type Phase = 'idle' | 'fetching' | 'extracting' | 'verifying' | 'done' | 'error';
@@ -58,13 +60,23 @@ export default function Home() {
   const [errorMsg, setErrorMsg] = useState('');
   const [samples, setSamples] = useState<SampleMap>({});
   const [showShareCard, setShowShareCard] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
   const levelIncremented = useRef(false);
+  const historySaved = useRef(false);
+  const currentSourceRef = useRef<'link' | 'paste' | 'sample'>('paste');
 
   const abortRef = useRef<AbortController | null>(null);
   const resultRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     fetch('/api/samples').then((r) => r.json()).then(setSamples).catch(() => undefined);
+  }, []);
+
+  // 监听 Header 触发的打开历史事件
+  useEffect(() => {
+    const onOpen = () => setShowHistory(true);
+    window.addEventListener('factbuddy:open-history', onOpen);
+    return () => window.removeEventListener('factbuddy:open-history', onOpen);
   }, []);
 
   const reset = () => {
@@ -78,22 +90,63 @@ export default function Home() {
     setErrorMsg('');
     setShowShareCard(false);
     levelIncremented.current = false;
+    historySaved.current = false;
   };
 
   const useSample = (s: SampleData) => {
-    // 点击样例 = 一键体验：填数据 + 立刻触发核查
-    // 用户视野会随 resultRef 自动滚到结果区
     setMode('paste');
     setTranscript(s.transcript);
     setTitle(s.title);
     setAuthor(s.author);
     reset();
+    currentSourceRef.current = 'sample';
     runCheck(s.transcript, s.title, s.author);
+  };
+
+  /** 从历史记录恢复结果（不重新调 API） */
+  const restoreFromHistory = (record: HistoryRecord) => {
+    setShowHistory(false);
+    reset();
+    setTitle(record.title);
+    setAuthor(record.author);
+    setMeta(record.meta ?? null);
+    // 恢复 extraction
+    setExtraction({
+      summary: record.summary,
+      primary_domain: '',
+      claims: record.claims.map((c) => ({
+        id: c.id,
+        text: c.text,
+        original_quote: '',
+        domain: c.domain,
+        priority: c.priority,
+        search_keywords: [],
+      })),
+      discarded_segments: Array.from({ length: record.discardedCount }).map(() => ({
+        text: '',
+        reason: 'marketing',
+      })),
+    });
+    // 恢复 verifications
+    const map = new Map<string, ClaimCardData>();
+    for (const [id, v] of Object.entries(record.verifications)) {
+      map.set(id, v);
+    }
+    setVerifications(map);
+    setProgress({ done: record.claims.length, total: record.claims.length });
+    setPhase('done');
+    historySaved.current = true; // 防止重复保存
+    levelIncremented.current = true; // 防止重复计数
+    // 滚到结果区
+    setTimeout(() => {
+      resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
   };
 
   const handleExtractAndCheck = async () => {
     if (!linkUrl.trim()) return;
     reset();
+    currentSourceRef.current = 'link';
     setPhase('fetching');
     setPhaseLabel('🦉 正在解析视频 · 抓取信息 · 转写音频…');
 
@@ -135,6 +188,7 @@ export default function Home() {
   const handleCheck = async () => {
     if (transcript.trim().length < 10) return;
     reset();
+    currentSourceRef.current = 'paste';
     await runCheck(transcript, title, author);
   };
 
@@ -204,6 +258,53 @@ export default function Home() {
             if (!levelIncremented.current) {
               incrementCheckCount();
               levelIncremented.current = true;
+            }
+            // 保存到历史记录
+            if (!historySaved.current) {
+              historySaved.current = true;
+              // 用 setTimeout 等 verifications 状态完全更新
+              setTimeout(() => {
+                setVerifications((current) => {
+                  const verifMap: Record<string, ClaimCardData> = {};
+                  let supported = 0,
+                    nei = 0,
+                    refuted = 0;
+                  current.forEach((v, id) => {
+                    verifMap[id] = v;
+                    if (v.verdict === 'SUPPORTED') supported += 1;
+                    else if (v.verdict === 'NEI') nei += 1;
+                    else if (v.verdict === 'REFUTED') refuted += 1;
+                  });
+                  const total = current.size;
+                  const score = total > 0
+                    ? Math.round(((supported + nei * 0.5) / total) * 100)
+                    : 0;
+                  setExtraction((extCurrent) => {
+                    if (extCurrent && current.size > 0) {
+                      addHistory({
+                        title: ti || '（无标题）',
+                        author: au || '未知作者',
+                        url: currentSourceRef.current === 'link' ? linkUrl : undefined,
+                        source: currentSourceRef.current,
+                        summary: extCurrent.summary,
+                        score,
+                        counts: { SUPPORTED: supported, NEI: nei, REFUTED: refuted },
+                        discardedCount: extCurrent.discarded_segments.length,
+                        claims: extCurrent.claims.map((c) => ({
+                          id: c.id,
+                          text: c.text,
+                          domain: c.domain,
+                          priority: c.priority,
+                        })),
+                        verifications: verifMap,
+                        meta: meta ?? undefined,
+                      });
+                    }
+                    return extCurrent;
+                  });
+                  return current;
+                });
+              }, 100);
             }
           } else if (eventName === 'error') {
             const e = data as { message: string };
@@ -703,6 +804,13 @@ export default function Home() {
           </section>
         )}
       </main>
+
+      {/* === 历史记录抽屉 === */}
+      <HistoryDrawer
+        open={showHistory}
+        onClose={() => setShowHistory(false)}
+        onSelect={restoreFromHistory}
+      />
 
       {/* === 转发分享卡片 modal === */}
       {showShareCard && extraction && (
